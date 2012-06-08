@@ -5,6 +5,9 @@ jQuery(function($) {
 		none:			'Geen',
 		button:			'Kleur',
 		title:			'Kies een lettertype',
+		family:			'Lettertype:',
+		style:			'Tekenstijl:',
+		size:			'Punten:',
 		previewText:	'Pa\'s wijze lynx bezag\nvroom het fikse aquaduct.'
 	};
 });

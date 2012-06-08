@@ -12,6 +12,16 @@
  * Sourcecode created from scratch by Martijn W. van der Lee.
  */
 
+//@todo text-box for family
+//@todo text-box for style
+//@put list of size, styles and fonts in options
+//@add settings section (with tabs?)
+//@move font specs into options, so user can supply them.
+//@add string parser for CSS. Use jQuery on hidden element to "cheat"?
+//@add defaultFont; allows inheritance
+//@allow clearing of all options for fallthrough?
+//@add "none" option.
+
 (function ($) {
 	"use strict";
 
@@ -23,6 +33,9 @@
 			none:			'None',
 			button:			'Font',
 			title:			'Pick a font',
+			family:			'Family:',
+			style:			'Style:',
+			size:			'Size:',
 			previewText:	'The quick brown fox jumps\nover the lazy dog.'
 		};
 	};
@@ -60,24 +73,24 @@
 			'Bold italic':			['bold', 'italic']
 		},
 
-		_sizes = {
-			'6px':				'6',
-			'7px':				'7',
-			'8px':				'8',
-			'9px':				'9',
-			'10px':				'10',
-			'11px':				'11',
-			'12px':				'12',
-			'14px':				'14',
-			'16px':				'16',
-			'18px':				'18',
-			'21px':				'21',
-			'24px':				'24',
-			'36px':				'36',
-			'48px':				'48',
-			'60px':				'60',
-			'72px':				'72'
-		},
+		_sizes = [	6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72 ],
+//			'6px':				'6',
+//			'7px':				'7',
+//			'8px':				'8',
+//			'9px':				'9',
+//			'10px':				'10',
+//			'11px':				'11',
+//			'12px':				'12',
+//			'14px':				'14',
+//			'16px':				'16',
+//			'18px':				'18',
+//			'21px':				'21',
+//			'24px':				'24',
+//			'36px':				'36',
+//			'48px':				'48',
+//			'60px':				'60',
+//			'72px':				'72'
+//		},
 
 		_is_numeric = function(value) {
 			return (typeof(value) === 'number' || typeof(value) === 'string') && value !== '' && !isNaN(value);
@@ -210,7 +223,8 @@
                     _html;
 
                 _html = function () {
-                    var html = '<div><input class="ui-fontpicker-family-text" type="text"/></div>';
+				    var html = '<div>'+inst._getRegional('family')+'</div>';
+                    html += '<div><input class="ui-fontpicker-family-text" type="text"/></div>';
 					html += '<div><select class="ui-fontpicker-family-select" size="8">';
 					$.each(_fonts, function(index, faces) {
 						html += '<option value="'+index+'">'+index+'</option>';
@@ -239,7 +253,8 @@
                     _html;
 
                 _html = function () {
-                    var html = '<div><input class="ui-fontpicker-style-text" type="text"/></div>';
+				    var html = '<div>'+inst._getRegional('style')+'</div>';
+                    html += '<div><input class="ui-fontpicker-style-text" type="text"/></div>';
 					html += '<div><select class="ui-fontpicker-style-select" size="8">';
 					$.each(_styles, function(index) {
 						html += '<option value="'+index+'">'+index+'</option>';
@@ -270,10 +285,11 @@
                     _html;
 
                 _html = function () {
-				    var html = '<div><input class="ui-fontpicker-size-text" type="text"/></div>';
+				    var html = '<div>'+inst._getRegional('size')+'</div>';
+				    html += '<div><input class="ui-fontpicker-size-text" type="text"/></div>';
 					html += '<div><select class="ui-fontpicker-size-select" size="8">';
 					$.each(_sizes, function(index, size) {
-						html += '<option value="'+index+'">'+size+'</option>';
+						html += '<option value="'+size+'">'+size+'</option>';
 					});
 					html += '</select></div>';
                     return '<div class="ui-fontpicker-size">'+html+'</div>';
@@ -282,15 +298,26 @@
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-size-container', inst.dialog));
 
+					$('.ui-fontpicker-size-text', e).on('change keyup', function() {
+						inst.font.size = Math.max(1, parseInt($(this).val()));
+						inst._change();
+					});
+
 					$('.ui-fontpicker-size-select', e).change( function() {
-						inst.font.size		= $(this).val();
+						inst.font.size = $(this).val();
 						inst._change();
 					});
                 };
 
-                this.update = function () {};
+                this.repaint = function () {
+					if (!$('.ui-fontpicker-size-text', e).is(':focus')) {
+						$('.ui-fontpicker-size-text', e).val(inst.font.size);
+					}
 
-                this.repaint = function () {};
+					if (!$('.ui-fontpicker-size-select', e).is(':focus')) {
+						$('.ui-fontpicker-size-select', e).val(inst.font.size);
+					}
+				};
             },
 
             settings: function (inst) {
@@ -588,7 +615,7 @@ font-family				Specifies the font family. See font-family for possible values
 					}
 
 					// Check if clicked on any part of dialog
-					if ($(event.target).parents('.ui-fontpicker').length > 0) {
+					if ($(event.target).closest('.ui-fontpicker').length > 0) {
 						that.element.blur();	// inside window!
 						return;
 					}
@@ -708,7 +735,6 @@ font-family				Specifies the font family. See font-family for possible values
 		 * If an alternate field is specified, set it according to the current color.
 		 */
 		_setAltField: function () {
-			console.log('hir');
 			if (this.options.altOnChange && this.options.altField) {
 				$(this.options.altField).attr('style', this.font.set? this.font.toCSS() : '');
 			}

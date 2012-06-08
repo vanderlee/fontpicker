@@ -5,6 +5,9 @@ jQuery(function($) {
 		none:			'None',
 		button:			'Color',
 		title:			'Pick a font',
+		family:			'Family:',
+		style:			'Style:',
+		size:			'Size:',
 		previewText:	'The quick brown fox jumps\nover the lazy dog.'
 	};
 });

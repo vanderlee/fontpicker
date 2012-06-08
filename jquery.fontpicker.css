@@ -64,25 +64,31 @@
 /* Family */
 .ui-fontpicker-family-text {
 	width: 146px;
+	margin: 0;
 }
 .ui-fontpicker-family-select {
 	width: 150px;
+	margin: 0;
 }
 
 /* Style */
 .ui-fontpicker-style-text {
 	width: 76px;
+	margin: 0;
 }
 .ui-fontpicker-style-select {
 	width: 80px;
+	margin: 0;
 }
 
 /* Size */
 .ui-fontpicker-size-text {
 	width: 46px;
+	margin: 0;
 }
 .ui-fontpicker-size-select {
 	width: 50px;
+	margin: 0;
 }
 
 /* Preview */
