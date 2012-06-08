@@ -23,7 +23,7 @@
 			none:			'None',
 			button:			'Font',
 			title:			'Pick a font',
-			previewText:	'The quick brown fox|jumps over the lazy dog'
+			previewText:	'The quick brown fox jumps\nover the lazy dog.'
 		};
 	};
 
@@ -199,12 +199,9 @@
                     });
                 };
 
-                this.generate = function () {
-                    this.repaint();
-                };
+                this.update = function () {};
 
-                this.repaint = function () {
-                };
+                this.repaint = function () {};
             },
 
             family: function (inst) {
@@ -231,7 +228,7 @@
 					});
                 };
 
-                this.generate = function () {};
+                this.update = function () {};
 
                 this.repaint = function () {};
             },
@@ -262,7 +259,7 @@
 					});
                 };
 
-                this.generate = function () {};
+                this.update = function () {};
 
                 this.repaint = function () {};
             },
@@ -291,7 +288,7 @@
 					});
                 };
 
-                this.generate = function () {};
+                this.update = function () {};
 
                 this.repaint = function () {};
             },
@@ -310,7 +307,7 @@
                     e = $(_html()).appendTo($('.ui-fontpicker-settings-container', inst.dialog));
                 };
 
-                this.generate = function () {};
+                this.update = function () {};
 
                 this.repaint = function () {};
             },
@@ -325,10 +322,14 @@
 					if (!text) {
 						text = inst._getRegional('previewText');
 					}
-					text = text.replace('|', '<br/>');
+					text = text.replace('\n', '<br/>');
 
 					var html = '<div class="ui-fontpicker-preview-text">'+text+'</div>';
-                    return '<div class="ui-fontpicker-preview">'+html+'</div>';
+                    var prev = '<div class="ui-fontpicker-preview">'+html+'</div>';
+                    var inner = '<div class="ui-fontpicker-preview-inner">'+prev+'</div>';
+                    var outer = '<div class="ui-fontpicker-preview-outer">'+inner+'</div>';
+
+					return outer;
                 };
 
                 this.init = function () {
@@ -339,7 +340,7 @@
 					$('.ui-fontpicker-preview-text', e).attr('style', inst.font.toCSS(true));
 				};
 
-                this.generate = function () {};
+                this.update = function () {};
             },
 
             footer: function (inst) {
@@ -391,7 +392,7 @@
 
                 this.repaint = function () {};
 
-                this.generate = function () {};
+                this.update = function () {};
             }
         },
 
@@ -784,7 +785,7 @@ font-family				Specifies the font family. See font-family for possible values
 				})).appendTo(that.dialog).addClass('ui-dialog-content ui-widget-content');
 
 				that._initAllParts();
-				that._generateAllParts();
+				that._updateAllParts();
 				that.generated = true;
 			}
 		},
@@ -836,9 +837,7 @@ font-family				Specifies the font family. See font-family for possible values
 				// Without waiting for domready the width of the map is 0 and we
 				// wind up with the cursor stuck in the upper left corner
 				$(function() {
-					$.each(that.parts, function (index, part) {
-						part.repaint();
-					});
+					that._repaintAllParts();
 				});
 			}
 		},
@@ -881,9 +880,19 @@ font-family				Specifies the font family. See font-family for possible values
 			}
 		},
 
-		_generateAllParts: function () {
+		_repaintAllParts: function () {
 			$.each(this.parts, function (index, part) {
-				part.generate();
+				if (part.repaint) {
+					part.repaint();
+				}
+			});
+		},
+
+		_updateAllParts: function () {
+			$.each(this.parts, function (index, part) {
+				if (part.update) {
+					part.update();
+				}
 			});
 		},
 
@@ -913,9 +922,7 @@ font-family				Specifies the font family. See font-family for possible values
 			this._setAltField();
 
 			if (this.opened) {
-				$.each(this.parts, function (index, part) {
-					part.repaint();
-				});
+				this._repaintAllParts();
 			}
 
 			// callback

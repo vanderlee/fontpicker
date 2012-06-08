@@ -5,6 +5,6 @@ jQuery(function($) {
 		none:			'Geen',
 		button:			'Kleur',
 		title:			'Kies een lettertype',
-		previewText:	'ABCabc|Blah Blah'
+		previewText:	'Pa\'s wijze lynx bezag\nvroom het fikse aquaduct.'
 	};
 });
