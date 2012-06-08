@@ -1,0 +1,99 @@
+.ui-fontpicker,
+.ui-dialog.ui-fontpicker {
+    display: inline-block;
+	width: auto;
+}
+
+.ui-fontpicker-inline {
+    position: static;
+}
+
+.ui-fontpicker-buttonset {
+	float: left;
+	margin-left: .4em;
+}
+
+.ui-fontpicker-buttonset .ui-button {
+	margin: .5em 0 .5em 0;
+	cursor: pointer;
+}
+
+.ui-fontpicker-buttonpane {
+	background-image: none;
+	margin:			.7em 0 0 0;
+	padding:		0 .2em;
+	border-left:	0;
+	border-right:	0;
+	border-bottom:	0;
+}
+
+.ui-fontpicker-buttonpane button {
+	float: right;
+	margin: .5em .2em .4em;
+	cursor: pointer;
+	padding: .2em .6em .3em .6em;
+	width:auto;
+	overflow:visible;
+}
+
+.ui-fontpicker-buttonpane button.ui-fontpicker-current {
+	float:left;
+}
+
+.ui-fontpicker table {
+    font-size: 100%; /* Reset browser table font-size */
+	margin: 0;
+}
+
+.ui-fontpicker table td {
+	vertical-align: top;
+}
+
+.ui-fontpicker-padding-left {
+	padding-left: 10px;
+}
+.ui-fontpicker-padding-top {
+	padding-top: 10px;
+}
+
+.ui-fontpicker-border {
+	border: 1px inset;
+    display: inline-block;
+}
+
+/* Family */
+.ui-fontpicker-family-text {
+	width: 146px;
+}
+.ui-fontpicker-family-select {
+	width: 150px;
+}
+
+/* Style */
+.ui-fontpicker-style-text {
+	width: 76px;
+}
+.ui-fontpicker-style-select {
+	width: 80px;
+}
+
+/* Size */
+.ui-fontpicker-size-text {
+	width: 46px;
+}
+.ui-fontpicker-size-select {
+	width: 50px;
+}
+
+/* Preview */
+.ui-fontpicker-preview {
+	border: solid thin gray;
+	margin: .2em;
+	overflow: hidden;
+	width: 100%;
+	height: 72px;
+}
+.ui-fontpicker-preview-text {
+	text-align: center;
+	white-space: nowrap;
+}
