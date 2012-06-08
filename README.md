@@ -1,4 +1,4 @@
-fontpicker
+Fontpicker
 ==========
 
-jQueryUI FontPicker with Themeroller styling.
+jQueryUI Fontpicker with Themeroller styling.
