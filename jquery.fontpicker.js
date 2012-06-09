@@ -12,8 +12,6 @@
  * Sourcecode created from scratch by Martijn W. van der Lee.
  */
 
-//@todo text-box for family
-//@todo text-box for style
 //@add settings section (with tabs?)
 //@move font specs into options, so user can supply them.
 //@add string parser for CSS. Use jQuery on hidden element to "cheat"?
@@ -193,15 +191,35 @@
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-family-container', inst.dialog));
 
+					$('.ui-fontpicker-family-text', e).on('change keyup', function() {
+						var family = $(this).val().toLowerCase();
+						$.each(inst.options.fonts, function(name, faces) {
+							if (name.toLowerCase() == family) {
+								inst.font.family	= faces;
+								inst._change();
+							}
+						});
+					});
+
 					$('.ui-fontpicker-family-select', e).change( function() {
-						inst.font.family = $(this).val();
+						inst.font.family = inst.options.fonts[$(this).val()];
 						inst._change();
 					});
                 };
 
-                this.update = function () {};
+                this.repaint = function () {
+					$.each(inst.options.fonts, function(name, faces) {
+						if (faces == inst.font.family) {
+							if (!$('.ui-fontpicker-family-text', e).is(':focus')) {
+								$('.ui-fontpicker-family-text', e).val(name);
+							}
 
-                this.repaint = function () {};
+							if (!$('.ui-fontpicker-family-select', e).is(':focus')) {
+								$('.ui-fontpicker-family-select', e).val(name);
+							}
+						}
+					});
+				};
             },
 
             style: function (inst) {
@@ -223,17 +241,38 @@
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-style-container', inst.dialog));
 
+					$('.ui-fontpicker-style-text', e).on('change keyup', function() {
+						var style = $(this).val().toLowerCase();
+						$.each(inst.options.styles, function(name, data) {
+							if (name.toLowerCase() == style) {
+								inst.font.weight	= data[0];
+								inst.font.style		= data[1];
+								inst._change();
+							}
+						});
+					});
+
 					$('.ui-fontpicker-style-select', e).change( function() {
-						var style = inst.options.styles[$(this).val()];
-						inst.font.weight	= style[0];
-						inst.font.style		= style[1];
+						var data = inst.options.styles[$(this).val()];
+						inst.font.weight	= data[0];
+						inst.font.style		= data[1];
 						inst._change();
 					});
                 };
 
-                this.update = function () {};
+                this.repaint = function () {
+					$.each(inst.options.styles, function(name, data) {
+						if (data[0] == inst.font.weight	&& data[1] == inst.font.style) {
+							if (!$('.ui-fontpicker-style-text', e).is(':focus')) {
+								$('.ui-fontpicker-style-text', e).val(name);
+							}
 
-                this.repaint = function () {};
+							if (!$('.ui-fontpicker-style-select', e).is(':focus')) {
+								$('.ui-fontpicker-style-select', e).val(name);
+							}
+						}
+					});
+				};
             },
 
             size: function (inst) {
@@ -416,13 +455,13 @@
 				}
 
 				if (this.family) {
-					var faces = [];
-					$.each(inst.options.fonts[this.family], function(index, face) {
-						faces.push(/^\S+$/.test(face)? face : '"'+face+'"');
-					});
-					if (faces.length > 0) {
-						parts['font-family'] = faces.join(',');
-					}
+//					var faces = [];
+//					$.each(inst.options.fonts[this.family], function(index, face) {
+//						faces.push(/^\S+$/.test(face)? face : '"'+face+'"');
+//					});
+//					if (faces.length > 0) {
+						parts['font-family'] = this.family.join(',');
+//					}
 				}
 
 				if (parts['font-family'] && parts['font-size']) {
@@ -539,7 +578,7 @@ font-family				Specifies the font family. See font-family for possible values
 			zIndex:				null,
 			previewText:		null,
 
-			fonts:				{	'Arial':				['Arial', 'Helvetica', 'sans-serif'],
+			fonts:				{'Arial':				['Arial', 'Helvetica', 'sans-serif'],
 									'Arial Black':			['Arial Black', 'Gadget', 'sans-serif'],
 									'Comic Sans MS':		['Comic Sans MS', 'cursive', 'sans-serif'],
 									'Courier New':			['Courier New', 'Courier', 'monospace'],
@@ -553,7 +592,7 @@ font-family				Specifies the font family. See font-family for possible values
 									'Trebuchet MS':			['Trebuchet MS', 'Helvetica', 'sans-serif'],
 									'Verdana':				['Verdana', 'Geneva', 'sans-serif'],
 								},
-			styles:				{	'Normal':				['normal', 'normal'],
+			styles:				{'Normal':				['normal', 'normal'],
 									'Bold':					['bold', 'normal'],
 									'Italic':				['normal', 'italic'],
 									'Bold italic':			['bold', 'italic']
