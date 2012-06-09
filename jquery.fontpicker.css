@@ -91,11 +91,11 @@
 	margin: 0;
 }
 
+/* Settings */
+
 /* Preview */
 .ui-fontpicker-preview-outer {
-	width: 100%;
-	border: solid thin gray;
-	margin: .2em;
+	border: inset thin white;
 	height: 80px;
 	position: relative;
 	overflow: hidden;

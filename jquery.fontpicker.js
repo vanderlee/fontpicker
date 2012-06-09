@@ -14,7 +14,6 @@
 
 //@todo text-box for family
 //@todo text-box for style
-//@put list of size, styles and fonts in options
 //@add settings section (with tabs?)
 //@move font specs into options, so user can supply them.
 //@add string parser for CSS. Use jQuery on hidden element to "cheat"?
@@ -49,48 +48,6 @@
 			'popup':	['family', 'style', 'size', 'settings', 'preview', 'footer'],
 			'inline':	['family', 'style', 'size', 'settings', 'preview']
 		},
-
-		_fonts = {
-			'Arial':				['Arial', 'Helvetica', 'sans-serif'],
-			'Arial Black':			['Arial Black', 'Gadget', 'sans-serif'],
-			'Comic Sans MS':		['Comic Sans MS', 'cursive', 'sans-serif'],
-			'Courier New':			['Courier New', 'Courier', 'monospace'],
-			'Georgia':				['Georgia', 'serif'],
-			'Impact':				['Impact', 'Charcoal', 'sans-serif'],
-			'Lucida Console':		['Lucida Console', 'Monaco', 'monospace'],
-			'Lucida Sans Unicode':	['Lucida Sans Unicode', 'Lucida Grande', 'sans-serif'],
-			'Palatino Linotype':	['Palatino Linotype', 'Book Antiqua', 'Palatino', 'serif'],
-			'Tahoma':				['Tahoma', 'Geneva', 'sans-serif'],
-			'Times New Roman':		['Times New Roman', 'Times', 'serif'],
-			'Trebuchet MS':			['Trebuchet MS', 'Helvetica', 'sans-serif'],
-			'Verdana':				['Verdana', 'Geneva', 'sans-serif'],
-		},
-
-		_styles = {
-			'Normal':				['normal', 'normal'],
-			'Bold':					['bold', 'normal'],
-			'Italic':				['normal', 'italic'],
-			'Bold italic':			['bold', 'italic']
-		},
-
-		_sizes = [	6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72 ],
-//			'6px':				'6',
-//			'7px':				'7',
-//			'8px':				'8',
-//			'9px':				'9',
-//			'10px':				'10',
-//			'11px':				'11',
-//			'12px':				'12',
-//			'14px':				'14',
-//			'16px':				'16',
-//			'18px':				'18',
-//			'21px':				'21',
-//			'24px':				'24',
-//			'36px':				'36',
-//			'48px':				'48',
-//			'60px':				'60',
-//			'72px':				'72'
-//		},
 
 		_is_numeric = function(value) {
 			return (typeof(value) === 'number' || typeof(value) === 'string') && value !== '' && !isNaN(value);
@@ -226,7 +183,7 @@
 				    var html = '<div>'+inst._getRegional('family')+'</div>';
                     html += '<div><input class="ui-fontpicker-family-text" type="text"/></div>';
 					html += '<div><select class="ui-fontpicker-family-select" size="8">';
-					$.each(_fonts, function(index, faces) {
+					$.each(inst.options.fonts, function(index, faces) {
 						html += '<option value="'+index+'">'+index+'</option>';
 					});
 					html += '</select></div>';
@@ -256,7 +213,7 @@
 				    var html = '<div>'+inst._getRegional('style')+'</div>';
                     html += '<div><input class="ui-fontpicker-style-text" type="text"/></div>';
 					html += '<div><select class="ui-fontpicker-style-select" size="8">';
-					$.each(_styles, function(index) {
+					$.each(inst.options.styles, function(index) {
 						html += '<option value="'+index+'">'+index+'</option>';
 					});
 					html += '</select></div>';
@@ -267,7 +224,7 @@
                     e = $(_html()).appendTo($('.ui-fontpicker-style-container', inst.dialog));
 
 					$('.ui-fontpicker-style-select', e).change( function() {
-						var style = _styles[$(this).val()];
+						var style = inst.options.styles[$(this).val()];
 						inst.font.weight	= style[0];
 						inst.font.style		= style[1];
 						inst._change();
@@ -288,7 +245,7 @@
 				    var html = '<div>'+inst._getRegional('size')+'</div>';
 				    html += '<div><input class="ui-fontpicker-size-text" type="text"/></div>';
 					html += '<div><select class="ui-fontpicker-size-select" size="8">';
-					$.each(_sizes, function(index, size) {
+					$.each(inst.options.sizes, function(index, size) {
 						html += '<option value="'+size+'">'+size+'</option>';
 					});
 					html += '</select></div>';
@@ -460,7 +417,7 @@
 
 				if (this.family) {
 					var faces = [];
-					$.each(_fonts[this.family], function(index, face) {
+					$.each(inst.options.fonts[this.family], function(index, face) {
 						faces.push(/^\S+$/.test(face)? face : '"'+face+'"');
 					});
 					if (faces.length > 0) {
@@ -581,6 +538,27 @@ font-family				Specifies the font family. See font-family for possible values
 			title:				null,
 			zIndex:				null,
 			previewText:		null,
+
+			fonts:				{	'Arial':				['Arial', 'Helvetica', 'sans-serif'],
+									'Arial Black':			['Arial Black', 'Gadget', 'sans-serif'],
+									'Comic Sans MS':		['Comic Sans MS', 'cursive', 'sans-serif'],
+									'Courier New':			['Courier New', 'Courier', 'monospace'],
+									'Georgia':				['Georgia', 'serif'],
+									'Impact':				['Impact', 'Charcoal', 'sans-serif'],
+									'Lucida Console':		['Lucida Console', 'Monaco', 'monospace'],
+									'Lucida Sans Unicode':	['Lucida Sans Unicode', 'Lucida Grande', 'sans-serif'],
+									'Palatino Linotype':	['Palatino Linotype', 'Book Antiqua', 'Palatino', 'serif'],
+									'Tahoma':				['Tahoma', 'Geneva', 'sans-serif'],
+									'Times New Roman':		['Times New Roman', 'Times', 'serif'],
+									'Trebuchet MS':			['Trebuchet MS', 'Helvetica', 'sans-serif'],
+									'Verdana':				['Verdana', 'Geneva', 'sans-serif'],
+								},
+			styles:				{	'Normal':				['normal', 'normal'],
+									'Bold':					['bold', 'normal'],
+									'Italic':				['normal', 'italic'],
+									'Bold italic':			['bold', 'italic']
+								},
+			sizes:				[	6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72 ],
 
 			close:              null,
 			select:             null
