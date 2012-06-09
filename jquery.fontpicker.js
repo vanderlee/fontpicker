@@ -12,12 +12,12 @@
  * Sourcecode created from scratch by Martijn W. van der Lee.
  */
 
-//@add settings section (with tabs?)
-//@move font specs into options, so user can supply them.
-//@add string parser for CSS. Use jQuery on hidden element to "cheat"?
-//@add defaultFont; allows inheritance
-//@allow clearing of all options for fallthrough?
-//@add "none" option.
+//@todo add settings section (with tabs?)
+//@todo move font specs into options, so user can supply them.
+//@todo add string parser for CSS. Use jQuery on hidden element to "cheat"?
+//@todo add defaultFont; allows inheritance
+//@todo allow clearing of all options for fallthrough?
+//@todo cancel button
 
 (function ($) {
 	"use strict";
