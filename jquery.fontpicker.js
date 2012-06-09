@@ -17,7 +17,6 @@
 //@todo add string parser for CSS. Use jQuery on hidden element to "cheat"?
 //@todo add defaultFont; allows inheritance
 //@todo allow clearing of all options for fallthrough?
-//@todo cancel button
 
 (function ($) {
 	"use strict";
@@ -552,7 +551,7 @@ font-family				Specifies the font family. See font-family for possible values
 
 	$.widget("vanderlee.fontpicker", {
 		options: {
-			altField:			'',			// selector for DOM elements which change background color on change.
+			altField:			'',			// selector for DOM elements which matches changes.
 			altOnChange:		true,		// true to update on each change, false to update only on close.
 			autoOpen:			false,		// Open dialog automatically upon creation
 			buttonImage:		'images/ui-fontpicker.png',
@@ -621,6 +620,7 @@ font-family				Specifies the font family. See font-family for possible values
 
 			if (this.element[0].nodeName.toLowerCase() === 'input') {
 				that._setFont(that.element.val());
+				that.currentFont	= $.extend({}, that.font);
 
 				$('body').append(_container_popup);
 				that.dialog = $('.ui-fontpicker:last');
@@ -696,11 +696,12 @@ font-family				Specifies the font family. See font-family for possible values
 						that.close();
 					}
 				}).keyup(function (event) {
-					var rgb = _parseHex(that.element.val());
-					if (rgb) {
-						that.color = (rgb === false ? new Font() : new Font(rgb[0], rgb[1], rgb[2]));
-						that._change();
-					}
+					//@todo Font parsing from text input
+//					var rgb = _parseHex(that.element.val());
+//					if (rgb) {
+//						that.color = (rgb === false ? new Font() : new Font(rgb[0], rgb[1], rgb[2]));
+//						that._change();
+//					}
 				});
 			} else {
 				that.inline = true;
@@ -749,7 +750,7 @@ font-family				Specifies the font family. See font-family for possible values
 		},
 
 		/**
-		 * If an alternate field is specified, set it according to the current color.
+		 * If an alternate field is specified, set it according to the current font.
 		 */
 		_setAltField: function () {
 			if (this.options.altOnChange && this.options.altField) {
@@ -759,8 +760,7 @@ font-family				Specifies the font family. See font-family for possible values
 
 		_setFont: function(text) {
 			//@todo this.font = _parseFont(text); //@todo parseFont from text (css-like?) return Font object
-            this.font = new Font();
-			this.currentFont = $.extend({}, this.font);
+            this.font			= new Font();
 		},
 
 		setFont: function(text) {
@@ -774,8 +774,9 @@ font-family				Specifies the font family. See font-family for possible values
 				part,
 				parts_list;
 
-			// Set color based on element?
-			that._setFont(that.inline? that.options.font : that.element.val());
+			// Set font based on element?
+			//that._setFont(that.inline? that.options.font : that.element.val());
+			//@todo Re-parse font from textbox/options?
 
 			// Determine the parts to include in this fontpicker
 			if (typeof that.options.parts === 'string') {
@@ -888,8 +889,7 @@ font-family				Specifies the font family. See font-family for possible values
 		close: function () {
 			var that = this;
 
-			this.currentFont	= $.extend({}, this.color);
-			this.changed		= false;
+			this.changed = false;
 
 			// tear down the interface
 			this._effectHide(function () {
