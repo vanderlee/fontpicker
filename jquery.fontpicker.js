@@ -32,6 +32,7 @@
 			family:			'Family:',
 			style:			'Style:',
 			size:			'Size:',
+			lineheight:		'Line height',
 			previewText:	'The quick brown fox jumps\nover the lazy dog.'
 		};
 	};
@@ -180,6 +181,9 @@
 				    var html = '<div>'+inst._getRegional('family')+'</div>';
                     html += '<div><input class="ui-fontpicker-family-text" type="text"/></div>';
 					html += '<div><select class="ui-fontpicker-family-select" size="8">';
+					if (inst.options.nullable) {
+						html += '<option></option>';
+					}
 					$.each(inst.options.fonts, function(index, faces) {
 						html += '<option value="'+index+'">'+index+'</option>';
 					});
@@ -192,12 +196,17 @@
 
 					$('.ui-fontpicker-family-text', e).on('change keyup', function() {
 						var family = $(this).val().toLowerCase();
-						$.each(inst.options.fonts, function(name, faces) {
-							if (name.toLowerCase() == family) {
-								inst.font.family	= faces;
-								inst._change();
-							}
-						});
+						if (inst.options.nullable && family == '') {
+							inst.font.family = null;
+							inst._change();
+						} else {
+							$.each(inst.options.fonts, function(name, faces) {
+								if (name.toLowerCase() == family) {
+									inst.font.family	= faces;
+									inst._change();
+								}
+							});
+						}
 					});
 
 					$('.ui-fontpicker-family-select', e).change( function() {
@@ -207,17 +216,19 @@
                 };
 
                 this.repaint = function () {
-					$.each(inst.options.fonts, function(name, faces) {
+					var name = '';
+					$.each(inst.options.fonts, function(index, faces) {
 						if (faces == inst.font.family) {
-							if (!$('.ui-fontpicker-family-text', e).is(':focus')) {
-								$('.ui-fontpicker-family-text', e).val(name);
-							}
-
-							if (!$('.ui-fontpicker-family-select', e).is(':focus')) {
-								$('.ui-fontpicker-family-select', e).val(name);
-							}
+							name = index;
+							return false;
 						}
 					});
+					if (!$('.ui-fontpicker-family-text', e).is(':focus')) {
+						$('.ui-fontpicker-family-text', e).val(name);
+					}
+					if (!$('.ui-fontpicker-family-select', e).is(':focus')) {
+						$('.ui-fontpicker-family-select', e).val(name);
+					}
 				};
             },
 
@@ -321,12 +332,17 @@
                     _html;
 
                 _html = function () {
-                    var html = '<div class="ui-fontpicker-settings"></div>';
-                    return html;
+                    var html = '<label><input class="ui-fontpicker-settings-lineheight" type="number"/>'+inst._getRegional('lineheight')+'</label>';
+                    return '<div class="ui-fontpicker-settings">'+html+'</div>';
                 };
 
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-settings-container', inst.dialog));
+
+					$('.ui-fontpicker-settings-lineheight', e).change( function() {
+						inst.font.lineHeight = $(this).val()+'%';
+						inst._change();
+					});
                 };
 
                 this.update = function () {};
@@ -454,13 +470,13 @@
 				}
 
 				if (this.family) {
-//					var faces = [];
-//					$.each(inst.options.fonts[this.family], function(index, face) {
-//						faces.push(/^\S+$/.test(face)? face : '"'+face+'"');
-//					});
-//					if (faces.length > 0) {
-						parts['font-family'] = this.family.join(',');
-//					}
+					var faces = [];
+					$.each(this.family, function(index, face) {
+						faces.push(/^\S+$/.test(face)? face : "'"+face+"'");
+					});
+					if (faces.length > 0) {
+						parts['font-family'] = faces.join(',');
+					}
 				}
 
 				if (parts['font-family'] && parts['font-size']) {
@@ -472,8 +488,8 @@
 							parts['font-size'] += '/'+parts['line-height'];
 						} else {
 							css = 'line-height:'+parts['line-height']+';';
-							parts['line-height'] = null;
 						}
+						parts['line-height'] = null;
 					}
 
 					var array = [];
@@ -541,7 +557,7 @@ font-family				Specifies the font family. See font-family for possible values
 
 			this.set		= false;
 
-			this.family		= '';
+			this.family		= [];
 			this.weight		= 'normal';	// normal, bold, bolder, lighter
 			this.style		= 'normal';	// normal, italic, oblique
 			this.smallcaps	= false;
@@ -576,7 +592,6 @@ font-family				Specifies the font family. See font-family for possible values
 			title:				null,
 			zIndex:				null,
 			previewText:		null,
-
 			fonts:				{'Arial':				['Arial', 'Helvetica', 'sans-serif'],
 									'Arial Black':			['Arial Black', 'Gadget', 'sans-serif'],
 									'Comic Sans MS':		['Comic Sans MS', 'cursive', 'sans-serif'],
@@ -597,6 +612,7 @@ font-family				Specifies the font family. See font-family for possible values
 									'Bold italic':			['bold', 'italic']
 								},
 			sizes:				[	6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72 ],
+			nullable:			true,
 
 			close:              null,
 			select:             null
@@ -607,21 +623,21 @@ font-family				Specifies the font family. See font-family for possible values
 
 			that.widgetEventPrefix = 'font';
 
-			that.opened		= false;
-			that.generated	= false;
-			that.inline		= false;
-			that.changed	= false;
+			that.opened			= false;
+			that.generated		= false;
+			that.inline			= false;
+			that.changed		= false;
 
-			that.dialog		= null;
-			that.button		= null;
-			that.image		= null;
+			that.dialog			= null;
+			that.button			= null;
+			that.image			= null;
 
-			that.mode		= that.options.mode;
+			that.mode			= that.options.mode;
+
+			that._setFont(that.element.val());
+			that.currentFont	= $.extend({}, that.font);
 
 			if (this.element[0].nodeName.toLowerCase() === 'input') {
-				that._setFont(that.element.val());
-				that.currentFont	= $.extend({}, that.font);
-
 				$('body').append(_container_popup);
 				that.dialog = $('.ui-fontpicker:last');
 
