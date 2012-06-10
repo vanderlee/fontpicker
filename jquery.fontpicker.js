@@ -184,7 +184,7 @@
 					if (inst.options.nullable) {
 						html += '<option></option>';
 					}
-					$.each(inst.options.fonts, function(index, faces) {
+					$.each(inst.options.families, function(index, faces) {
 						html += '<option value="'+index+'">'+index+'</option>';
 					});
 					html += '</select></div>';
@@ -200,7 +200,7 @@
 							inst.font.family = null;
 							inst._change();
 						} else {
-							$.each(inst.options.fonts, function(name, faces) {
+							$.each(inst.options.families, function(name, faces) {
 								if (name.toLowerCase() == family) {
 									inst.font.family	= faces;
 									inst._change();
@@ -210,14 +210,14 @@
 					});
 
 					$('.ui-fontpicker-family-select', e).change( function() {
-						inst.font.family = inst.options.fonts[$(this).val()];
+						inst.font.family = inst.options.families[$(this).val()];
 						inst._change();
 					});
                 };
 
                 this.repaint = function () {
 					var name = '';
-					$.each(inst.options.fonts, function(index, faces) {
+					$.each(inst.options.families, function(index, faces) {
 						if (faces == inst.font.family) {
 							name = index;
 							return false;
@@ -507,54 +507,6 @@
 				}
 			};
 
-		/*
-
-font-style				Specifies the font style. See font-style for possible values
-	normal
-	italic
-	oblique
-font-variant			Specifies the font variant. See font-variant for possible values
-	normal
-	small-caps
-font-weight				Specifies the font weight. See font-weight for possible values
-	normal	Defines normal characters. This is default
-	bold	Defines thick characters
-	bolder	Defines thicker characters
-	lighter	Defines lighter characters
-	100
-	200
-	300
-	400
-	500
-	600
-	700
-	800
-	900
-font-size/line-height	Specifies the font size and the line-height. See font-size and line-height for possible values
-	i.e. 2em/111%;
-	font-size
-		xx-small	Sets the font-size to an xx-small size
-		x-small	Sets the font-size to an extra small size
-		small	Sets the font-size to a small size
-		medium	Sets the font-size to a medium size. This is default
-		large	Sets the font-size to a large size
-		x-large	Sets the font-size to an extra large size
-		xx-large	Sets the font-size to an xx-large size
-		smaller	Sets the font-size to a smaller size than the parent element
-		larger	Sets the font-size to a larger size than the parent element
-		length	Sets the font-size to a fixed size in px, cm, etc.
-		%	Sets the font-size to a percent of  the parent element's font size
-	line-height
-		normal	A normal line height. This is default
-		number	A number that will be multiplied with the current font size to set the line height
-		length	A fixed line height in px, pt, cm, etc.
-		%
-font-family				Specifies the font family. See font-family for possible values
-	comma-separated prioritized list of font families.
-	"serif", "sans-serif", "cursive", "fantasy", "monospace"
-
-		*/
-
 			this.set		= false;
 
 			this.family		= [];
@@ -592,7 +544,7 @@ font-family				Specifies the font family. See font-family for possible values
 			title:				null,
 			zIndex:				null,
 			previewText:		null,
-			fonts:				{'Arial':				['Arial', 'Helvetica', 'sans-serif'],
+			families:			{	'Arial':				['Arial', 'Helvetica', 'sans-serif'],
 									'Arial Black':			['Arial Black', 'Gadget', 'sans-serif'],
 									'Comic Sans MS':		['Comic Sans MS', 'cursive', 'sans-serif'],
 									'Courier New':			['Courier New', 'Courier', 'monospace'],
@@ -606,7 +558,7 @@ font-family				Specifies the font family. See font-family for possible values
 									'Trebuchet MS':			['Trebuchet MS', 'Helvetica', 'sans-serif'],
 									'Verdana':				['Verdana', 'Geneva', 'sans-serif'],
 								},
-			styles:				{'Normal':				['normal', 'normal'],
+			styles:				{	'Normal':				['normal', 'normal'],
 									'Bold':					['bold', 'normal'],
 									'Italic':				['normal', 'italic'],
 									'Bold italic':			['bold', 'italic']
