@@ -173,156 +173,157 @@
             },
 
             family: function (inst) {
-                var that	= this,
-                    e		= null,
-                    _html;
-
-                _html = function () {
-				    var html = '<div>'+inst._getRegional('family')+'</div>';
-                    html += '<div><input class="ui-fontpicker-family-text" type="text"/></div>';
-					html += '<div><select class="ui-fontpicker-family-select" size="8">';
-					if (inst.options.nullable) {
-						html += '<option></option>';
-					}
-					$.each(inst.options.families, function(index, faces) {
-						html += '<option value="'+index+'">'+index+'</option>';
-					});
-					html += '</select></div>';
-                    return '<div class="ui-fontpicker-family">'+html+'</div>';
-                };
+                var that		= this,
+                    e			= null,
+                    _html		= function () {
+									var html = '<div>'+inst._getRegional('family')+'</div>';
+									html += '<div><input class="ui-fontpicker-family-text" type="text"/></div>';
+									html += '<div><select class="ui-fontpicker-family-select" size="8">';
+									$.each(_families(), function(index, family) {
+										html += '<option value="'+family.name+'">'+family.name+'</option>';
+									});
+									html += '</select></div>';
+									return '<div class="ui-fontpicker-family">'+html+'</div>';
+								},
+					_families	= function() {
+									var families = inst.options.families.slice();
+									if (inst.options.nullable) {
+										families.unshift({
+											name: '',
+											faces: null
+										});
+									}
+									return families;
+								},
+					_set		= function(name) {
+									$.each(_families(), function(index, family) {
+										if (family.name.toLowerCase() == name.toLowerCase()) {
+											inst.font.family = family.faces;
+											inst._change();
+											return false;	// break
+										}
+									});
+								};
 
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-family-container', inst.dialog));
 
 					$('.ui-fontpicker-family-text', e).on('change keyup', function() {
-						var family = $(this).val().toLowerCase();
-						if (inst.options.nullable && family == '') {
-							inst.font.family = null;
-							inst._change();
-						} else {
-							$.each(inst.options.families, function(name, faces) {
-								if (name.toLowerCase() == family) {
-									inst.font.family	= faces;
-									inst._change();
-								}
-							});
-						}
+						_set($(this).val());
 					});
 
-					$('.ui-fontpicker-family-select', e).change( function() {
-						inst.font.family = inst.options.families[$(this).val()];
-						inst._change();
+					$('.ui-fontpicker-family-select', e).change(function() {
+						_set($(this).val());
 					});
                 };
 
                 this.repaint = function () {
-					var name = '';
-					$.each(inst.options.families, function(index, faces) {
-						if (faces == inst.font.family) {
-							name = index;
-							return false;
+					$.each(_families(), function(index, family) {
+						if (family.faces == inst.font.family) {
+							$('.ui-fontpicker-family-text,.ui-fontpicker-family-select', e).not(':focus').val(family.name);
+							return false;	// break
 						}
 					});
-					if (!$('.ui-fontpicker-family-text', e).is(':focus')) {
-						$('.ui-fontpicker-family-text', e).val(name);
-					}
-					if (!$('.ui-fontpicker-family-select', e).is(':focus')) {
-						$('.ui-fontpicker-family-select', e).val(name);
-					}
 				};
             },
 
             style: function (inst) {
-                var that		= this,
-                    e			= null,
-                    _html;
-
-                _html = function () {
-				    var html = '<div>'+inst._getRegional('style')+'</div>';
-                    html += '<div><input class="ui-fontpicker-style-text" type="text"/></div>';
-					html += '<div><select class="ui-fontpicker-style-select" size="8">';
-					$.each(inst.options.styles, function(index) {
-						html += '<option value="'+index+'">'+index+'</option>';
-					});
-					html += '</select></div>';
-                    return '<div class="ui-fontpicker-style">'+html+'</div>';
-                };
+                var that	= this,
+                    e		= null,
+                    _html	= function () {
+								var html = '<div>'+inst._getRegional('style')+'</div>';
+								html += '<div><input class="ui-fontpicker-style-text" type="text"/></div>';
+								html += '<div><select class="ui-fontpicker-style-select" size="8">';
+								$.each(_styles(), function(index, style) {
+									html += '<option value="'+style.name+'">'+style.name+'</option>';
+								});
+								html += '</select></div>';
+								return '<div class="ui-fontpicker-style">'+html+'</div>';
+							},
+					_styles	= function() {
+								var styles = inst.options.styles.slice();
+								if (inst.options.nullable) {
+									styles.unshift({
+										name: '',
+										weight: null,
+										style: null
+									});
+								}
+								return styles;
+							},
+					_set	= function(name) {
+								$.each(_styles(), function(index, style) {
+									if (style.name.toLowerCase() == name.toLowerCase()) {
+										inst.font.weight	= style.weight;
+										inst.font.style		= style.style;
+										inst._change();
+										return false;	// break
+									}
+								});
+							};
 
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-style-container', inst.dialog));
 
 					$('.ui-fontpicker-style-text', e).on('change keyup', function() {
-						var style = $(this).val().toLowerCase();
-						$.each(inst.options.styles, function(name, data) {
-							if (name.toLowerCase() == style) {
-								inst.font.weight	= data[0];
-								inst.font.style		= data[1];
-								inst._change();
-							}
-						});
+						_set($(this).val());
 					});
 
-					$('.ui-fontpicker-style-select', e).change( function() {
-						var data = inst.options.styles[$(this).val()];
-						inst.font.weight	= data[0];
-						inst.font.style		= data[1];
-						inst._change();
+					$('.ui-fontpicker-style-select', e).change(function() {
+						_set($(this).val());
 					});
                 };
 
                 this.repaint = function () {
-					$.each(inst.options.styles, function(name, data) {
-						if (data[0] == inst.font.weight	&& data[1] == inst.font.style) {
-							if (!$('.ui-fontpicker-style-text', e).is(':focus')) {
-								$('.ui-fontpicker-style-text', e).val(name);
-							}
-
-							if (!$('.ui-fontpicker-style-select', e).is(':focus')) {
-								$('.ui-fontpicker-style-select', e).val(name);
-							}
+					$.each(_styles(), function(index, style) {
+						if (style.weight == inst.font.weight
+								&& style.style == inst.font.style) {
+							$('.ui-fontpicker-style-text,.ui-fontpicker-style-select', e).not(':focus').val(style.name);
+							return false;	// break
 						}
 					});
 				};
             },
 
             size: function (inst) {
-                var that		= this,
-                    e			= null,
-                    _html;
-
-                _html = function () {
-				    var html = '<div>'+inst._getRegional('size')+'</div>';
-				    html += '<div><input class="ui-fontpicker-size-text" type="text"/></div>';
-					html += '<div><select class="ui-fontpicker-size-select" size="8">';
-					$.each(inst.options.sizes, function(index, size) {
-						html += '<option value="'+size+'">'+size+'</option>';
-					});
-					html += '</select></div>';
-                    return '<div class="ui-fontpicker-size">'+html+'</div>';
-                };
+                var that	= this,
+                    e		= null,
+                    _html	= function () {
+								var html = '<div>'+inst._getRegional('size')+'</div>';
+								html += '<div><input class="ui-fontpicker-size-text" type="text"/></div>';
+								html += '<div><select class="ui-fontpicker-size-select" size="8">';
+								$.each(_sizes(), function(index, size) {
+									html += '<option value="'+size+'">'+size+'</option>';
+								});
+								html += '</select></div>';
+								return '<div class="ui-fontpicker-size">'+html+'</div>';
+							},
+					_sizes	= function() {
+								var sizes = inst.options.sizes.slice();
+								if (inst.options.nullable) {
+									sizes.unshift('');
+								}
+								return sizes;
+							},
+					_set	= function(size) {
+								inst.font.size = Math.max(1, parseInt(size)) || null;
+								inst._change();
+							};
 
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-size-container', inst.dialog));
 
 					$('.ui-fontpicker-size-text', e).on('change keyup', function() {
-						inst.font.size = Math.max(1, parseInt($(this).val()));
-						inst._change();
+						_set($(this).val());
 					});
 
 					$('.ui-fontpicker-size-select', e).change( function() {
-						inst.font.size = $(this).val();
-						inst._change();
+						_set($(this).val());
 					});
                 };
 
                 this.repaint = function () {
-					if (!$('.ui-fontpicker-size-text', e).is(':focus')) {
-						$('.ui-fontpicker-size-text', e).val(inst.font.size);
-					}
-
-					if (!$('.ui-fontpicker-size-select', e).is(':focus')) {
-						$('.ui-fontpicker-size-select', e).val(inst.font.size);
-					}
+					$('.ui-fontpicker-size-text,.ui-fontpicker-size-select', e).not(':focus').val(inst.font.size);
 				};
             },
 
@@ -544,27 +545,66 @@
 			title:				null,
 			zIndex:				null,
 			previewText:		null,
-			families:			{	'Arial':				['Arial', 'Helvetica', 'sans-serif'],
-									'Arial Black':			['Arial Black', 'Gadget', 'sans-serif'],
-									'Comic Sans MS':		['Comic Sans MS', 'cursive', 'sans-serif'],
-									'Courier New':			['Courier New', 'Courier', 'monospace'],
-									'Georgia':				['Georgia', 'serif'],
-									'Impact':				['Impact', 'Charcoal', 'sans-serif'],
-									'Lucida Console':		['Lucida Console', 'Monaco', 'monospace'],
-									'Lucida Sans Unicode':	['Lucida Sans Unicode', 'Lucida Grande', 'sans-serif'],
-									'Palatino Linotype':	['Palatino Linotype', 'Book Antiqua', 'Palatino', 'serif'],
-									'Tahoma':				['Tahoma', 'Geneva', 'sans-serif'],
-									'Times New Roman':		['Times New Roman', 'Times', 'serif'],
-									'Trebuchet MS':			['Trebuchet MS', 'Helvetica', 'sans-serif'],
-									'Verdana':				['Verdana', 'Geneva', 'sans-serif'],
-								},
-			styles:				{	'Normal':				['normal', 'normal'],
-									'Bold':					['bold', 'normal'],
-									'Italic':				['normal', 'italic'],
-									'Bold italic':			['bold', 'italic']
-								},
+			families:			[	{	name: 'Arial',
+										faces: ['Arial', 'Helvetica', 'sans-serif']
+									},
+									{	name: 'Arial Black',
+										faces: ['Arial Black', 'Gadget', 'sans-serif']
+									},
+									{	name: 'Comic Sans MS',
+										faces: ['Comic Sans MS', 'cursive', 'sans-serif']
+									},
+									{	name: 'Courier New',
+										faces: ['Courier New', 'Courier', 'monospace']
+									},
+									{	name: 'Georgia',
+										faces: ['Georgia', 'serif']
+									},
+									{	name: 'Impact',
+										faces: ['Impact', 'Charcoal', 'sans-serif']
+									},
+									{	name: 'Lucida Console',
+										faces: ['Lucida Console', 'Monaco', 'monospace']
+									},
+									{	name: 'Lucida Sans Unicode',
+										faces: ['Lucida Sans Unicode', 'Lucida Grande', 'sans-serif']
+									},
+									{	name: 'Palatino Linotype',
+										faces: ['Palatino Linotype', 'Book Antiqua', 'Palatino', 'serif']
+									},
+									{	name: 'Tahoma',
+										faces: ['Tahoma', 'Geneva', 'sans-serif']
+									},
+									{	name: 'Times New Roman',
+										faces: ['Times New Roman', 'Times', 'serif']
+									},
+									{	name: 'Trebuchet MS',
+										faces: ['Trebuchet MS', 'Helvetica', 'sans-serif']
+									},
+									{	name: 'Verdana',
+										faces: ['Verdana', 'Geneva', 'sans-serif']
+									}
+								],
+			styles:				[	{	name:	'Normal',
+										weight:	'normal',
+										style:	'normal'
+									},
+									{	name:	'Bold',
+										weight:	'bold',
+										style:	'normal'
+									},
+									{	name:	'Italic',
+										weight:	'normal',
+										style:	'italic'
+									},
+									{	name:	'Bold italic',
+										weight:	'bold',
+										style:	'italic'
+									}
+								],
 			sizes:				[	6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72 ],
 			nullable:			true,
+//			font:				new Font(),
 
 			close:              null,
 			select:             null
