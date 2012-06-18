@@ -17,6 +17,42 @@
 //@todo add string parser for CSS. Use jQuery on hidden element to "cheat"?
 //@todo add defaultFont; allows inheritance
 //@todo allow clearing of all options for fallthrough?
+//@todo webfont support?				http://www.w3schools.com/cssref/css3_pr_font-face_rule.asp
+//@todo inventory potential font CSS/HTML settings
+//	character
+//		color
+//		background-color
+//		superscript/subscript (VA)		http://www.w3schools.com/cssref/pr_pos_vertical-align.asp
+//		opacity (filter on ie)			http://www.w3schools.com/cssref/css3_pr_opacity.asp
+//		font-variant:small-caps;		http://www.w3schools.com/cssref/pr_font_font-variant.asp
+//		font-style:oblique;				http://www.w3schools.com/cssref/pr_font_font-style.asp
+//		font-size-adjust (mozilla only)	http://www.w3schools.com/cssref/css3_pr_font-size-adjust.asp
+//		letter-spacing (all)			http://www.w3schools.com/cssref/pr_text_letter-spacing.asp
+//		text-decoration					http://www.w3schools.com/cssref/pr_text_text-decoration.asp
+//		text-shadow	(filter on ie)		http://www.w3schools.com/cssref/css3_pr_text-shadow.asp
+//		text-transform					http://www.w3schools.com/cssref/pr_text_text-transform.asp
+//		<antialiassing mode>			subpixel/antialias/none: -webkit-font-smoothing: none; doesn't work
+//		<Multiple-shadow effects>		not supported on all browsers.
+//											3D, Fire, stroke, etc. http://kremalicious.com/make-cool-and-clever-text-effects-with-css-text-shadow/
+//											Anaglyph http://www.1stwebdesigner.com/css/css3-text-effects-typography/
+//											Blur
+//											Emboss
+//											3d	http://www.cssrex.com/tips-tricks/how-to-create-3d-text-using-css3/
+//											http://www.midwinter-dg.com/blog_demos/css-text-shadows/
+//		-webkit-text-fill-color			http://www.webkit.org/blog/85/introducing-text-stroke/	http://www.quirksmode.org/css/stroke.html
+//		-webkit-text-stroke-color		http://www.webkit.org/blog/85/introducing-text-stroke/
+//		-webkit-text-stroke-width		http://www.webkit.org/blog/85/introducing-text-stroke/
+//	text (span, multiple words)
+//		line-height (all)				http://www.w3schools.com/cssref/pr_dim_line-height.asp
+//		white-space:nowrap
+//		word-spacing					http://www.w3schools.com/cssref/pr_text_word-spacing.asp
+//		word-break						http://www.w3schools.com/cssref/css3_pr_word-break.asp
+//		word-wrap						http://www.w3schools.com/cssref/css3_pr_word-wrap.asp
+//	paragraph (usefull in blocks only; requires defined edges)
+//		text-align						http://www.w3schools.com/cssref/pr_text_text-align.asp
+//		text-indent						http://www.w3schools.com/cssref/pr_text_text-indent.asp
+//		text-justify					http://www.w3schools.com/cssref/css3_pr_text-justify.asp
+//		text-overflow					http://www.w3schools.com/cssref/css3_pr_text-overflow.asp
 
 (function ($) {
 	"use strict";
@@ -32,7 +68,8 @@
 			family:			'Family:',
 			style:			'Style:',
 			size:			'Size:',
-			lineheight:		'Line height',
+			line_height:	'Line height',
+			letter_spacing:	'Letter spacing',
 			previewText:	'The quick brown fox jumps\nover the lazy dog.'
 		};
 	};
@@ -52,13 +89,7 @@
 		},
 
 		_layoutTable = function(layout, callback) {
-			var layout = layout.sort(function(a, b) {
-					if (a.pos[1] == b.pos[1]) {
-						return a.pos[0] - b.pos[0];
-					}
-					return a.pos[1] - b.pos[1];
-				}),
-				bitmap,
+			var bitmap,
 				x,
 				y,
 				width, height,
@@ -66,6 +97,13 @@
 				index,
 				cell,
 				html;
+
+			layout.sort(function(a, b) {
+				if (a.pos[1] == b.pos[1]) {
+					return a.pos[0] - b.pos[0];
+				}
+				return a.pos[1] - b.pos[1];
+			})
 
 			// Determine dimensions of the table
 			width = 0;
@@ -141,6 +179,48 @@
 			return '<table cellspacing="0" cellpadding="0" border="0"><tbody>' + html + '</tbody></table>';
 		},
 
+		_settings = {
+			'line-height':	function (inst) {
+				var that	= this,
+					input	= null;
+
+				this.paintTo = function(container) {
+                    input = $('<input step="5" min="0" type="number" value=""/>').appendTo(container);
+					input.after('%');
+
+					input.change( function() {
+						var value = $(this).val();
+						inst.font.css['line-height'] = value? value+'%' : null;
+						inst._change();
+					});
+				};
+
+				this.label = function() {
+					return inst._getRegional('line_height');
+				};
+			},
+
+			'letter-spacing':	function (inst) {
+				var that	= this,
+					input	= null;
+
+				this.paintTo = function(container) {
+                    input = $('<input type="number" value=""/>').appendTo(container);
+					input.after('px');
+
+					input.change( function() {
+						var value = $(this).val();
+						inst.font.css['letter-spacing'] = value? value+'px' : null;
+						inst._change();
+					});
+				};
+
+				this.label = function() {
+					return inst._getRegional('letter_spacing');
+				};
+			}
+		},
+
         _parts = {
             header: function (inst) {
                 var that = this,
@@ -166,10 +246,6 @@
                         inst.close()
                     });
                 };
-
-                this.update = function () {};
-
-                this.repaint = function () {};
             },
 
             family: function (inst) {
@@ -177,7 +253,7 @@
                     e			= null,
                     _html		= function () {
 									var html = '<div>'+inst._getRegional('family')+'</div>';
-									html += '<div><input class="ui-fontpicker-family-text" type="text"/></div>';
+									html += '<div style="padding-right:4px;"><input class="ui-fontpicker-family-text" type="text"/></div>';
 									html += '<div><select class="ui-fontpicker-family-select" size="8">';
 									$.each(_families(), function(index, family) {
 										html += '<option value="'+family.name+'">'+family.name+'</option>';
@@ -232,7 +308,7 @@
                     e		= null,
                     _html	= function () {
 								var html = '<div>'+inst._getRegional('style')+'</div>';
-								html += '<div><input class="ui-fontpicker-style-text" type="text"/></div>';
+								html += '<div style="padding-right:4px;"><input class="ui-fontpicker-style-text" type="text"/></div>';
 								html += '<div><select class="ui-fontpicker-style-select" size="8">';
 								$.each(_styles(), function(index, style) {
 									html += '<option value="'+style.name+'">'+style.name+'</option>';
@@ -290,7 +366,7 @@
                     e		= null,
                     _html	= function () {
 								var html = '<div>'+inst._getRegional('size')+'</div>';
-								html += '<div><input class="ui-fontpicker-size-text" type="text"/></div>';
+								html += '<div style="padding-right:4px;"><input class="ui-fontpicker-size-text" type="text"/></div>';
 								html += '<div><select class="ui-fontpicker-size-select" size="8">';
 								$.each(_sizes(), function(index, size) {
 									html += '<option value="'+size+'">'+size+'</option>';
@@ -330,25 +406,33 @@
             settings: function (inst) {
                 var that		= this,
                     e			= null,
-                    _html;
-
-                _html = function () {
-                    var html = '<label><input class="ui-fontpicker-settings-lineheight" type="number"/>'+inst._getRegional('lineheight')+'</label>';
-                    return '<div class="ui-fontpicker-settings">'+html+'</div>';
-                };
+                    _html		= function () {
+									return '<div class="ui-fontpicker-settings"><ul/></div>';
+								};
 
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-settings-container', inst.dialog));
 
-					$('.ui-fontpicker-settings-lineheight', e).change( function() {
-						inst.font.lineHeight = $(this).val()+'%';
-						inst._change();
+					var _fontpicker_index = 0;	//@todo global context;
+
+					inst.settings = {};
+					$.each(inst.options.settings, function(label, settings) {
+						var id = 'ui-fontpicker-settings-'+label.toLowerCase()+'-'+_fontpicker_index;
+
+						$('ul', e).append('<li><a href="#'+id+'">'+label+'</a></li>');
+						//$('<li><a href="#'+id+'">'+label+'</a></li>').appendTo($('ul', e));
+
+						var page = $('<div id="'+id+'"></div>').appendTo(e);
+						$.each(settings, function(index, setting) {
+							var item = new _settings[setting](inst);
+							var control = $('<div><label>'+item.label()+'</label></div>').appendTo(page);
+							item.paintTo(control);
+							inst.settings[setting] = item;
+						});
 					});
+
+					e.tabs();
                 };
-
-                this.update = function () {};
-
-                this.repaint = function () {};
             },
 
             preview: function (inst) {
@@ -378,8 +462,6 @@
                 this.repaint = function () {
 					$('.ui-fontpicker-preview-text', e).attr('style', inst.font.toCSS(true));
 				};
-
-                this.update = function () {};
             },
 
             footer: function (inst) {
@@ -428,18 +510,10 @@
                         inst._change(false);
                     });
                 };
-
-                this.repaint = function () {};
-
-                this.update = function () {};
             }
         },
 
         Font = function () {
-			this.copy = function () {
-				return $.extend({}, this);
-			};
-
 			this.toCSS = function() {
 				var parts = {};
 
@@ -466,10 +540,6 @@
 					parts['font-size'] = _is_numeric(this.size)? this.size+'px' : this.size;
 				}
 
-				if (this.lineHeight) {
-					parts['line-height'] = _is_numeric(this.lineHeight)? this.lineHeight+'px' : this.lineHeight;
-				}
-
 				if (this.family) {
 					var faces = [];
 					$.each(this.family, function(index, face) {
@@ -480,42 +550,32 @@
 					}
 				}
 
-				if (parts['font-family'] && parts['font-size']) {
-					var css = '';
+				var css = '';
+				$.each(parts, function(tag, value) {
+					css += tag+':'+value+';';
+				});
 
-					//@todo combine font-size/line-height
-					if (parts['line-height']) {
-						if (parts['font-size']) {
-							parts['font-size'] += '/'+parts['line-height'];
-						} else {
-							css = 'line-height:'+parts['line-height']+';';
-						}
-						parts['line-height'] = null;
-					}
-
-					var array = [];
-					$.each(parts, function(index, part) {
-						array.push(part);
-					});
-					css += 'font:'+array.join(' ')+';';
-					return css;
-				} else {
-					var css = '';
-					$.each(parts, function(tag, value) {
+				$.each(this.css, function(tag, value) {
+					if (value) {
 						css += tag+':'+value+';';
-					});
-					return css;
-				}
+					}
+				});
+
+				return css;
 			};
 
 			this.set		= false;
+
+			this.css		= {};
+
+			//@todo Do everything in the CSS thing?
+			//@todo ... or at root level?
 
 			this.family		= [];
 			this.weight		= 'normal';	// normal, bold, bolder, lighter
 			this.style		= 'normal';	// normal, italic, oblique
 			this.smallcaps	= false;
 			this.size		= null;		// pixels
-			this.lineHeight	= null;		// percentage
 		};
 
 	$.widget("vanderlee.fontpicker", {
@@ -603,6 +663,13 @@
 									}
 								],
 			sizes:				[	6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72 ],
+			settings:			{	'Character': [
+										'letter-spacing'
+									],
+									'Paragraph': [
+										'line-height'
+									]
+								},
 			nullable:			true,
 //			font:				new Font(),
 
@@ -931,11 +998,9 @@
 			}
 		},
 
-		_repaintAllParts: function () {
+		_initAllParts: function () {
 			$.each(this.parts, function (index, part) {
-				if (part.repaint) {
-					part.repaint();
-				}
+				part.init();
 			});
 		},
 
@@ -947,9 +1012,11 @@
 			});
 		},
 
-		_initAllParts: function () {
+		_repaintAllParts: function () {
 			$.each(this.parts, function (index, part) {
-				part.init();
+				if (part.repaint) {
+					part.repaint();
+				}
 			});
 		},
 

@@ -63,31 +63,31 @@
 
 /* Family */
 .ui-fontpicker-family-text {
-	width: 146px;
+	width: 100%;
 	margin: 0;
 }
 .ui-fontpicker-family-select {
-	width: 150px;
+	width: 100%;
 	margin: 0;
 }
 
 /* Style */
 .ui-fontpicker-style-text {
-	width: 76px;
+	width: 100%;
 	margin: 0;
 }
 .ui-fontpicker-style-select {
-	width: 80px;
+	width: 100%;
 	margin: 0;
 }
 
 /* Size */
 .ui-fontpicker-size-text {
-	width: 46px;
+	width: 100%;
 	margin: 0;
 }
 .ui-fontpicker-size-select {
-	width: 50px;
+	width: 100%;
 	margin: 0;
 }
 
