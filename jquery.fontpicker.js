@@ -27,7 +27,6 @@
 //		font-variant:small-caps;		http://www.w3schools.com/cssref/pr_font_font-variant.asp
 //		font-style:oblique;				http://www.w3schools.com/cssref/pr_font_font-style.asp
 //		font-size-adjust (mozilla only)	http://www.w3schools.com/cssref/css3_pr_font-size-adjust.asp
-//		letter-spacing (all)			http://www.w3schools.com/cssref/pr_text_letter-spacing.asp
 //		text-decoration					http://www.w3schools.com/cssref/pr_text_text-decoration.asp
 //		text-shadow	(filter on ie)		http://www.w3schools.com/cssref/css3_pr_text-shadow.asp
 //		text-transform					http://www.w3schools.com/cssref/pr_text_text-transform.asp
@@ -43,7 +42,6 @@
 //		-webkit-text-stroke-color		http://www.webkit.org/blog/85/introducing-text-stroke/
 //		-webkit-text-stroke-width		http://www.webkit.org/blog/85/introducing-text-stroke/
 //	text (span, multiple words)
-//		line-height (all)				http://www.w3schools.com/cssref/pr_dim_line-height.asp
 //		white-space:nowrap
 //		word-spacing					http://www.w3schools.com/cssref/pr_text_word-spacing.asp
 //		word-break						http://www.w3schools.com/cssref/css3_pr_word-break.asp
@@ -74,7 +72,9 @@
 		};
 	};
 
-	var _container_popup = '<div class="ui-fontpicker ui-fontpicker-dialog ui-dialog ui-widget ui-widget-content ui-corner-all" style="display: none;"></div>',
+	var _fontpicker_index = 0,
+
+		_container_popup = '<div class="ui-fontpicker ui-fontpicker-dialog ui-dialog ui-widget ui-widget-content ui-corner-all" style="display: none;"></div>',
 
 		_container_inline = '<div class="ui-fontpicker ui-fontpicker-inline ui-dialog ui-widget ui-widget-content ui-corner-all"></div>',
 
@@ -185,7 +185,7 @@
 					input	= null;
 
 				this.paintTo = function(container) {
-                    input = $('<input step="5" min="0" type="number" value=""/>').appendTo(container);
+                    input = $('<input step="5" min="0" max="9999" type="number" value=""/>').appendTo(container);
 					input.after('%');
 
 					input.change( function() {
@@ -205,12 +205,13 @@
 					input	= null;
 
 				this.paintTo = function(container) {
-                    input = $('<input type="number" value=""/>').appendTo(container);
-					input.after('px');
+                    input = $('<input type="number" min="-999" max="9999" value=""/>').appendTo(container);
+					//input.after('px');
+					input.after('%');
 
 					input.change( function() {
 						var value = $(this).val();
-						inst.font.css['letter-spacing'] = value? value+'px' : null;
+						inst.font.css['letter-spacing'] = value && value != 0? value+'px' : null;
 						inst._change();
 					});
 				};
@@ -310,25 +311,14 @@
 								var html = '<div>'+inst._getRegional('style')+'</div>';
 								html += '<div style="padding-right:4px;"><input class="ui-fontpicker-style-text" type="text"/></div>';
 								html += '<div><select class="ui-fontpicker-style-select" size="8">';
-								$.each(_styles(), function(index, style) {
+								$.each(inst.options.styles, function(index, style) {
 									html += '<option value="'+style.name+'">'+style.name+'</option>';
 								});
 								html += '</select></div>';
 								return '<div class="ui-fontpicker-style">'+html+'</div>';
 							},
-					_styles	= function() {
-								var styles = inst.options.styles.slice();
-								if (inst.options.nullable) {
-									styles.unshift({
-										name: '',
-										weight: null,
-										style: null
-									});
-								}
-								return styles;
-							},
 					_set	= function(name) {
-								$.each(_styles(), function(index, style) {
+								$.each(inst.options.styles, function(index, style) {
 									if (style.name.toLowerCase() == name.toLowerCase()) {
 										inst.font.weight	= style.weight;
 										inst.font.style		= style.style;
@@ -351,7 +341,7 @@
                 };
 
                 this.repaint = function () {
-					$.each(_styles(), function(index, style) {
+					$.each(inst.options.styles, function(index, style) {
 						if (style.weight == inst.font.weight
 								&& style.style == inst.font.style) {
 							$('.ui-fontpicker-style-text,.ui-fontpicker-style-select', e).not(':focus').val(style.name);
@@ -413,8 +403,6 @@
                 this.init = function () {
                     e = $(_html()).appendTo($('.ui-fontpicker-settings-container', inst.dialog));
 
-					var _fontpicker_index = 0;	//@todo global context;
-
 					inst.settings = {};
 					$.each(inst.options.settings, function(label, settings) {
 						var id = 'ui-fontpicker-settings-'+label.toLowerCase()+'-'+_fontpicker_index;
@@ -467,6 +455,7 @@
             footer: function (inst) {
                 var that = this,
                     e = null,
+					id_none = 'ui-fontpicker-special-none-'+_fontpicker_index,
                     _html;
 
                 _html = function () {
@@ -476,7 +465,7 @@
                         html += '<div class="ui-fontpicker-buttonset">';
 
                         if (!inst.inline && inst.options.showNoneButton) {
-                            html += '<input type="radio" name="ui-fontpicker-special" id="ui-fontpicker-special-none"><label for="ui-fontpicker-special-none">' + inst._getRegional('none') + '</label>';
+                            html += '<input type="radio" name="ui-fontpicker-special" id="'+id_none+'"><label for="'+id_none+'">' + inst._getRegional('none') + '</label>';
                         }
                         html += '</div>';
                     }
@@ -506,7 +495,7 @@
 
                     $('.ui-fontpicker-buttonset', e).buttonset();
 
-                    $('#ui-fontpicker-special-none', e).click(function () {
+                    $('#'+id_none, e).click(function () {
                         inst._change(false);
                     });
                 };
@@ -603,7 +592,6 @@
 			showOn:				'focus',	// 'focus', 'button', 'both'
 			showOptions:		{},
 			title:				null,
-			zIndex:				null,
 			previewText:		null,
 			families:			[	{	name: 'Arial',
 										faces: ['Arial', 'Helvetica', 'sans-serif']
@@ -679,6 +667,8 @@
 
 		_create: function () {
 			var that = this;
+
+			++_fontpicker_index;
 
 			that.widgetEventPrefix = 'font';
 
@@ -935,24 +925,30 @@
 		},
 
 		open: function () {
-			if (!this.opened) {
-				if (this.options.zIndex) {
-					this.dialog.css('z-index', this.options.zIndex);
-				}
+			var that = this;
 
-				this._generate();
+			if (!that.opened) {
+				// Automatically find highest z-index.
+				$(that.element[0]).parents().each(function() {
+					var zIndex = $(this).css('z-index');
+					if ((typeof(zIndex) === 'number' || typeof(zIndex) === 'string') && zIndex !== '' && !isNaN(zIndex)) {
+						that.dialog.css('z-index', zIndex + 1);
+						return false;
+					}
+				});
 
-				var offset = this.element.offset(),
+				that._generate();
+
+				var offset = that.element.offset(),
 					x = offset.left,
-					y = offset.top + this.element.outerHeight();
-				x -= Math.max(0, (x + this.dialog.width()) - $(window).width() + 20);
-				y -= Math.max(0, (y + this.dialog.height()) - $(window).height() + 20);
-				this.dialog.css({'left': x, 'top': y});
+					y = offset.top + that.element.outerHeight();
+				x -= Math.max(0, (x + that.dialog.width()) - $(window).width() + 20);
+				y -= Math.max(0, (y + that.dialog.height()) - $(window).height() + 20);
+				that.dialog.css({'left': x, 'top': y});
 
-				this._effectShow();
-				this.opened = true;
+				that._effectShow();
+				that.opened = true;
 
-				var that = this;
 				// Without waiting for domready the width of the map is 0 and we
 				// wind up with the cursor stuck in the upper left corner
 				$(function() {
@@ -964,14 +960,10 @@
 		close: function () {
 			var that = this;
 
-			this.changed = false;
+			that.changed = false;
 
 			// tear down the interface
-			this._effectHide(function () {
-				if (that.options.zIndex) {
-					that.dialog.css('z-index', '');
-				}
-
+			that._effectHide(function () {
 				that.dialog.empty();
 				that.generated	= false;
 
