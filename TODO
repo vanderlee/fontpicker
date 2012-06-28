@@ -1,0 +1,42 @@
+Parse from CSS text tags (cheat?)
+Parse from DOM element properties
+Font color support
+Normalize font options; all to simple format.
+Create settings table: 2 x 2 columns (middle spacing?)
+move font specs into options, so user can supply them.
+add defaultFont; allows inheritance
+allow clearing of all options for fallthrough?
+webfont support?				http://www.w3schools.com/cssref/css3_pr_font-face_rule.asp
+inventory potential font CSS/HTML settings
+
+character
+	color
+	background-color
+	superscript/subscript (VA)		http://www.w3schools.com/cssref/pr_pos_vertical-align.asp
+	opacity (filter on ie)			http://www.w3schools.com/cssref/css3_pr_opacity.asp
+	font-style:oblique;				http://www.w3schools.com/cssref/pr_font_font-style.asp
+	font-size-adjust (mozilla only)	http://www.w3schools.com/cssref/css3_pr_font-size-adjust.asp
+	text-decoration					http://www.w3schools.com/cssref/pr_text_text-decoration.asp
+	text-shadow	(filter on ie)		http://www.w3schools.com/cssref/css3_pr_text-shadow.asp
+	text-transform					http://www.w3schools.com/cssref/pr_text_text-transform.asp
+	<antialiassing mode>			subpixel/antialias/none: -webkit-font-smoothing: none; doesn't work
+	<Multiple-shadow effects>		not supported on all browsers.
+										3D, Fire, stroke, etc. http://kremalicious.com/make-cool-and-clever-text-effects-with-css-text-shadow/
+										Anaglyph http://www.1stwebdesigner.com/css/css3-text-effects-typography/
+										Blur
+										Emboss
+										3d	http://www.cssrex.com/tips-tricks/how-to-create-3d-text-using-css3/
+										http://www.midwinter-dg.com/blog_demos/css-text-shadows/
+	-webkit-text-fill-color			http://www.webkit.org/blog/85/introducing-text-stroke/	http://www.quirksmode.org/css/stroke.html
+	-webkit-text-stroke-color		http://www.webkit.org/blog/85/introducing-text-stroke/
+	-webkit-text-stroke-width		http://www.webkit.org/blog/85/introducing-text-stroke/
+text (span, multiple words)
+	white-space:nowrap
+	word-spacing					http://www.w3schools.com/cssref/pr_text_word-spacing.asp
+	word-break						http://www.w3schools.com/cssref/css3_pr_word-break.asp
+	word-wrap						http://www.w3schools.com/cssref/css3_pr_word-wrap.asp
+paragraph (usefull in blocks only; requires defined edges)
+	text-align						http://www.w3schools.com/cssref/pr_text_text-align.asp
+	text-indent						http://www.w3schools.com/cssref/pr_text_text-indent.asp
+	text-justify					http://www.w3schools.com/cssref/css3_pr_text-justify.asp
+	text-overflow					http://www.w3schools.com/cssref/css3_pr_text-overflow.asp

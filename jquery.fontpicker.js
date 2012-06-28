@@ -12,62 +12,26 @@
  * Sourcecode created from scratch by Martijn W. van der Lee.
  */
 
-//@todo add settings section (with tabs?)
-//@todo move font specs into options, so user can supply them.
-//@todo add string parser for CSS. Use jQuery on hidden element to "cheat"?
-//@todo add defaultFont; allows inheritance
-//@todo allow clearing of all options for fallthrough?
-//@todo webfont support?				http://www.w3schools.com/cssref/css3_pr_font-face_rule.asp
-//@todo inventory potential font CSS/HTML settings
-//	character
-//		color
-//		background-color
-//		superscript/subscript (VA)		http://www.w3schools.com/cssref/pr_pos_vertical-align.asp
-//		opacity (filter on ie)			http://www.w3schools.com/cssref/css3_pr_opacity.asp
-//		font-variant:small-caps;		http://www.w3schools.com/cssref/pr_font_font-variant.asp
-//		font-style:oblique;				http://www.w3schools.com/cssref/pr_font_font-style.asp
-//		font-size-adjust (mozilla only)	http://www.w3schools.com/cssref/css3_pr_font-size-adjust.asp
-//		text-decoration					http://www.w3schools.com/cssref/pr_text_text-decoration.asp
-//		text-shadow	(filter on ie)		http://www.w3schools.com/cssref/css3_pr_text-shadow.asp
-//		text-transform					http://www.w3schools.com/cssref/pr_text_text-transform.asp
-//		<antialiassing mode>			subpixel/antialias/none: -webkit-font-smoothing: none; doesn't work
-//		<Multiple-shadow effects>		not supported on all browsers.
-//											3D, Fire, stroke, etc. http://kremalicious.com/make-cool-and-clever-text-effects-with-css-text-shadow/
-//											Anaglyph http://www.1stwebdesigner.com/css/css3-text-effects-typography/
-//											Blur
-//											Emboss
-//											3d	http://www.cssrex.com/tips-tricks/how-to-create-3d-text-using-css3/
-//											http://www.midwinter-dg.com/blog_demos/css-text-shadows/
-//		-webkit-text-fill-color			http://www.webkit.org/blog/85/introducing-text-stroke/	http://www.quirksmode.org/css/stroke.html
-//		-webkit-text-stroke-color		http://www.webkit.org/blog/85/introducing-text-stroke/
-//		-webkit-text-stroke-width		http://www.webkit.org/blog/85/introducing-text-stroke/
-//	text (span, multiple words)
-//		white-space:nowrap
-//		word-spacing					http://www.w3schools.com/cssref/pr_text_word-spacing.asp
-//		word-break						http://www.w3schools.com/cssref/css3_pr_word-break.asp
-//		word-wrap						http://www.w3schools.com/cssref/css3_pr_word-wrap.asp
-//	paragraph (usefull in blocks only; requires defined edges)
-//		text-align						http://www.w3schools.com/cssref/pr_text_text-align.asp
-//		text-indent						http://www.w3schools.com/cssref/pr_text_text-indent.asp
-//		text-justify					http://www.w3schools.com/cssref/css3_pr_text-justify.asp
-//		text-overflow					http://www.w3schools.com/cssref/css3_pr_text-overflow.asp
-
 (function ($) {
 	"use strict";
 
 	$.fontpicker = new function() {
 		this.regional = [];
 		this.regional[''] =	{
-			ok:				'OK',
-			cancel:			'Cancel',
-			none:			'None',
-			button:			'Font',
-			title:			'Pick a font',
-			family:			'Family:',
-			style:			'Style:',
-			size:			'Size:',
-			line_height:	'Line height',
-			letter_spacing:	'Letter spacing',
+			ok:					'OK',
+			cancel:				'Cancel',
+			none:				'None',
+			button:				'Font',
+			title:				'Pick a font',
+			family:				'Family:',
+			style:				'Style:',
+			size:				'Size:',
+			'line-height':		'Line height',
+			'letter-spacing':	'Letter spacing',
+			'small-caps':		'Small caps',
+			'underline':		'Underline',
+			'overline':			'Overline',
+			'line-through':		'Strike through',
 			previewText:	'The quick brown fox jumps\nover the lazy dog.'
 		};
 	};
@@ -179,24 +143,91 @@
 			return '<table cellspacing="0" cellpadding="0" border="0"><tbody>' + html + '</tbody></table>';
 		},
 
+		_setWord = function(sentence, word, set) {
+			var words = sentence? sentence.split(' ') : [];
+			var index = $.inArray(word, words);
+			if (set && index < 0) {
+				words.push(word);
+			} else if (!set && index >= 0) {
+				words.splice(index, 1);
+			}
+			return words.length > 0? words.join(' ') : null;
+		},
+
 		_settings = {
 			'line-height':	function (inst) {
-				var that	= this,
-					input	= null;
+				var that	= this;
 
 				this.paintTo = function(container) {
-                    input = $('<input step="5" min="0" max="9999" type="number" value=""/>').appendTo(container);
-					input.after('%');
-
-					input.change( function() {
+                    $('<input step="5" min="0" max="9999" type="number" value=""/>').appendTo(container).change(function() {
 						var value = $(this).val();
 						inst.font.css['line-height'] = value? value+'%' : null;
+						inst._change();
+					}).after('%');
+				};
+
+				this.label = function() {
+					return inst._getRegional('line-height');
+				};
+			},
+
+			'small-caps':	function (inst) {
+				var that	= this;
+
+				this.paintTo = function(container) {
+                    $('<input type="checkbox"/>').appendTo(container).change(function() {
+						inst.font.css['font-variant'] = $(this).is(':checked')? 'small-caps' : null;
 						inst._change();
 					});
 				};
 
 				this.label = function() {
-					return inst._getRegional('line_height');
+					return inst._getRegional('small-caps');
+				};
+			},
+
+			'underline':	function (inst) {
+				var that	= this;
+
+				this.paintTo = function(container) {
+                    $('<input type="checkbox"/>').appendTo(container).change(function() {
+						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'underline', $(this).is(':checked'));
+						inst._change();
+					});
+				};
+
+				this.label = function() {
+					return inst._getRegional('underline');
+				};
+			},
+
+			'overline':	function (inst) {
+				var that	= this;
+
+				this.paintTo = function(container) {
+                    $('<input type="checkbox"/>').appendTo(container).change(function() {
+						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'overline', $(this).is(':checked'));
+						inst._change();
+					});
+				};
+
+				this.label = function() {
+					return inst._getRegional('overline');
+				};
+			},
+
+			'line-through':	function (inst) {
+				var that	= this;
+
+				this.paintTo = function(container) {
+                    $('<input type="checkbox"/>').appendTo(container).change(function() {
+						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
+						inst._change();
+					});
+				};
+
+				this.label = function() {
+					return inst._getRegional('line-through');
 				};
 			},
 
@@ -217,7 +248,7 @@
 				};
 
 				this.label = function() {
-					return inst._getRegional('letter_spacing');
+					return inst._getRegional('letter-spacing');
 				};
 			}
 		},
@@ -408,15 +439,32 @@
 						var id = 'ui-fontpicker-settings-'+label.toLowerCase()+'-'+_fontpicker_index;
 
 						$('ul', e).append('<li><a href="#'+id+'">'+label+'</a></li>');
-						//$('<li><a href="#'+id+'">'+label+'</a></li>').appendTo($('ul', e));
 
 						var page = $('<div id="'+id+'"></div>').appendTo(e);
-						$.each(settings, function(index, setting) {
-							var item = new _settings[setting](inst);
-							var control = $('<div><label>'+item.label()+'</label></div>').appendTo(page);
-							item.paintTo(control);
-							inst.settings[setting] = item;
-						});
+
+						var columns = 3;
+						var chunk_size = Math.ceil(settings.length / columns);
+
+						//@todo Better chunking algorithm that prefers columns over chunk_size
+						var chunks = [].concat.apply([],
+							settings.map(function(elem, i) {
+								return i % chunk_size? [] : [settings.slice(i, i + chunk_size)];
+							})
+						);
+
+						var table = $('<table class="ui-fontpicker-settings-table"/>').appendTo(page);
+						for (var r = 0; r < chunk_size; ++r) {
+							var row = $('<tr/>').appendTo(table);
+							for (var c = 0; c < columns; ++c) {
+								if (chunks[c] && chunks[c][r]) {
+									var item = new _settings[chunks[c][r]](inst);
+									$('<td class="ui-fontpicker-settings-label"/>').text(item.label()).appendTo(row);
+									item.paintTo($('<td/>').appendTo(row));
+								} else {
+									$('<td width="'+(100 / columns)+'%" colspan="2"/>').appendTo(row);
+								}
+							}
+						}
 					});
 
 					e.tabs();
@@ -652,7 +700,11 @@
 								],
 			sizes:				[	6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72 ],
 			settings:			{	'Character': [
-										'letter-spacing'
+										'letter-spacing',
+										'small-caps',
+										'underline',
+										'overline',
+										'line-through'
 									],
 									'Paragraph': [
 										'line-height'
