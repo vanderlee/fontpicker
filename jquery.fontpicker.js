@@ -154,6 +154,11 @@
 			return words.length > 0? words.join(' ') : null;
 		},
 
+		_hasWord = function(sentence, word) {
+			var r = new RegExp('\\b'+word+'\\b', 'i');
+			return r.test(sentence);
+		},
+
 		_settings = {
 			'line-height':	function (inst) {
 				var that	= this;
@@ -190,7 +195,10 @@
 				var that	= this;
 
 				this.paintTo = function(container) {
-                    $('<input type="checkbox"/>').appendTo(container).change(function() {
+                    $('<input type="checkbox"/>')
+					.attr('checked', _hasWord(inst.font.css['text-decoration'], 'underline'))
+					.appendTo(container)
+					.change(function() {
 						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'underline', $(this).is(':checked'));
 						inst._change();
 					});
@@ -205,7 +213,10 @@
 				var that	= this;
 
 				this.paintTo = function(container) {
-                    $('<input type="checkbox"/>').appendTo(container).change(function() {
+                    $('<input type="checkbox"/>')
+					.attr('checked', _hasWord(inst.font.css['text-decoration'], 'overline'))
+					.appendTo(container)
+					.change(function() {
 						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'overline', $(this).is(':checked'));
 						inst._change();
 					});
@@ -220,7 +231,10 @@
 				var that	= this;
 
 				this.paintTo = function(container) {
-                    $('<input type="checkbox"/>').appendTo(container).change(function() {
+                    $('<input type="checkbox"/>')
+					.attr('checked', _hasWord(inst.font.css['text-decoration'], 'line-through'))
+					.appendTo(container)
+					.change(function() {
 						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
 						inst._change();
 					});
@@ -306,7 +320,7 @@
 					_set		= function(name) {
 									$.each(_families(), function(index, family) {
 										if (family.name.toLowerCase() == name.toLowerCase()) {
-											inst.font.family = family.faces;
+											inst.font.css['font-family'] = family.faces;
 											inst._change();
 											return false;	// break
 										}
@@ -326,9 +340,10 @@
                 };
 
                 this.repaint = function () {
+					var face = inst.font.css['font-family'] ? inst.font.css['font-family'][0] : '';
 					$.each(_families(), function(index, family) {
-						if (family.faces == inst.font.family) {
-							$('.ui-fontpicker-family-text,.ui-fontpicker-family-select', e).not(':focus').val(family.name);
+						if (family.faces == inst.font.css['font-family']) {
+							$('.ui-fontpicker-family-text,.ui-fontpicker-family-select', e).not(':focus').val(face);
 							return false;	// break
 						}
 					});
@@ -351,8 +366,8 @@
 					_set	= function(name) {
 								$.each(inst.options.styles, function(index, style) {
 									if (style.name.toLowerCase() == name.toLowerCase()) {
-										inst.font.weight	= style.weight;
-										inst.font.style		= style.style;
+										inst.font.css['font-weight']	= style.weight == 'normal' ? null : style.weight;
+										inst.font.css['font-style']		= style.style == 'normal' ? null : style.style;
 										inst._change();
 										return false;	// break
 									}
@@ -372,9 +387,11 @@
                 };
 
                 this.repaint = function () {
+					var bold	= inst.font.css['font-weight'] || 'normal',
+						italic	= inst.font.css['font-style'] || 'normal';
 					$.each(inst.options.styles, function(index, style) {
-						if (style.weight == inst.font.weight
-								&& style.style == inst.font.style) {
+						if (style.weight	== bold
+						 && style.style		== italic) {
 							$('.ui-fontpicker-style-text,.ui-fontpicker-style-select', e).not(':focus').val(style.name);
 							return false;	// break
 						}
@@ -403,7 +420,7 @@
 								return sizes;
 							},
 					_set	= function(size) {
-								inst.font.size = Math.max(1, parseInt(size)) || null;
+								inst.font.css['font-size'] = size? Math.max(1, parseInt(size))+'px' : null;
 								inst._change();
 							};
 
@@ -420,7 +437,8 @@
                 };
 
                 this.repaint = function () {
-					$('.ui-fontpicker-size-text,.ui-fontpicker-size-select', e).not(':focus').val(inst.font.size);
+					var size = inst.font.css['font-size'] ? parseInt(inst.font.css['font-size']) : '';
+					$('.ui-fontpicker-size-text,.ui-fontpicker-size-select', e).not(':focus').val(size);
 				};
             },
 
@@ -552,67 +570,38 @@
 
         Font = function () {
 			this.toCSS = function() {
-				var parts = {};
-
-				switch (this.style) {
-					case 'italic':
-					case 'oblique':
-						parts['font-style'] = this.style;
-						break;
-				}
-
-				if (this.smallcaps) {
-					parts['font-variant'] = 'small-caps';
-				}
-
-				switch (this.weight) {
-					case 'bold':
-					case 'bolder':
-					case 'lighter':
-						parts['font-weight'] = this.weight;
-						break;
-				}
-
-				if (this.size) {
-					parts['font-size'] = _is_numeric(this.size)? this.size+'px' : this.size;
-				}
-
-				if (this.family) {
-					var faces = [];
-					$.each(this.family, function(index, face) {
-						faces.push(/^\S+$/.test(face)? face : "'"+face+"'");
-					});
-					if (faces.length > 0) {
-						parts['font-family'] = faces.join(',');
-					}
-				}
-
 				var css = '';
-				$.each(parts, function(tag, value) {
-					css += tag+':'+value+';';
-				});
-
 				$.each(this.css, function(tag, value) {
-					if (value) {
-						css += tag+':'+value+';';
+					if (value !== null) {
+						if ($.isArray(value)) {
+							var parts = [];
+							$.each(value, function(index, part) {
+								parts.push(/^\S+$/.test(part)? part : '"'+part+'"');
+							});
+							if (parts.length > 0) {
+								css += tag+':'+parts.join(',')+';';
+							}
+						} else {
+							css += tag+':'+value+';';
+						}
 					}
 				});
-
 				return css;
 			};
 
 			this.set		= false;
 
-			this.css		= {};
-
-			//@todo Do everything in the CSS thing?
-			//@todo ... or at root level?
-
-			this.family		= [];
-			this.weight		= 'normal';	// normal, bold, bolder, lighter
-			this.style		= 'normal';	// normal, italic, oblique
-			this.smallcaps	= false;
-			this.size		= null;		// pixels
+			this.css		= {
+//				'font-family':		null
+//			,	'font-size':		null
+//			,	'color':			null
+//			,	'text-decoration':	null
+//			,	'letter-spacing':	null
+//			,	'font-weight':		null
+//			,	'font-style':		null
+//			,	'line-height':		null
+//			,	'font-variant':		null
+			};
 		};
 
 	$.widget("vanderlee.fontpicker", {
@@ -634,6 +623,7 @@
 				settings:	[0, 1, 3, 1],
 				preview:	[0, 2, 3, 1]
 			},
+			modal:				false,		// Modal dialog?
 			parts:				'',			// leave empty for automatic selection
 			showAnim:			'fadeIn',
 			showNoneButton:		false,
@@ -711,7 +701,6 @@
 									]
 								},
 			nullable:			true,
-//			font:				new Font(),
 
 			close:              null,
 			select:             null
@@ -724,21 +713,23 @@
 
 			that.widgetEventPrefix = 'font';
 
-			that.opened			= false;
-			that.generated		= false;
-			that.inline			= false;
-			that.changed		= false;
+			that.opened		= false;
+			that.generated	= false;
+			that.inline		= false;
+			that.changed	= false;
 
-			that.dialog			= null;
-			that.button			= null;
-			that.image			= null;
-
-			that.mode			= that.options.mode;
-
-			that._setFont(that.element.val());
-			that.currentFont	= $.extend({}, that.font);
+			that.dialog		= null;
+			that.button		= null;
+			that.image		= null;
+			that.overlay	= null;
 
 			if (this.element[0].nodeName.toLowerCase() === 'input') {
+				that._setFont(that.element.val());
+
+				that.currentFont	= $.extend({}, that.font);	//@todo right place?
+
+				this._callback('init');
+
 				$('body').append(_container_popup);
 				that.dialog = $('.ui-fontpicker:last');
 
@@ -848,6 +839,10 @@
 			if (this.dialog !== null) {
 				this.dialog.remove();
 			}
+
+			if (this.overlay) {
+				this.overlay.destroy();
+			}
 		},
 
 		_setOption: function(key, value){
@@ -875,9 +870,65 @@
 			}
 		},
 
-		_setFont: function(text) {
+		_setFont: function(style) {
+			var that = this;
+
+            that.font			= new Font();
+
+			var normal_tests = {
+				'text-decoration':	'none'
+			,	'letter-spacing':	'normal'
+			,	'font-weight':		'normal'
+			,	'font-style':		'normal'
+			,	'line-height':		'normal'
+			,	'font-variant':		'normal'
+			};
+
+			var inherit_tests = {
+				'font-family':		[ 'sans-serif', 'serif' ]
+			,	'font-size':		[ '10px', '20px' ]
+			,	'color':			[ 'black', 'white' ]
+			};
+
 			//@todo this.font = _parseFont(text); //@todo parseFont from text (css-like?) return Font object
-            this.font			= new Font();
+			var shell = $('<div>').appendTo('body');
+			var item = $('<div style="'+style+'"/>').appendTo(shell);
+
+			var results = {};
+
+			$.each(normal_tests, function(tag, value) {
+				shell.css(tag, value);
+				var actual = item.css(tag);
+				if (actual != value) {
+					that.font.css[tag] = actual;
+				}
+			});
+
+			$.each(inherit_tests, function(tag, values) {
+				shell.css(tag, values[0]);
+				var actual = item.css(tag);
+				shell.css(tag, values[1]);
+				if (actual == item.css(tag)) {
+					if (tag == 'font-family') {
+						var faces = actual.split(/,/);
+						actual = null;
+						$.each(faces, function(index, face) {
+							face = $.trim(face.replace(/^(['"])(.*)\1$/, '$2'));
+							$.each(that.options.families, function(index, family) {
+								if (face == family.name) {
+									actual = family.faces;
+									return false;
+								}
+							});
+							return actual === null;
+						});
+					}
+
+					that.font.css[tag] = actual;
+				}
+			});
+
+			shell.remove();
 		},
 
 		setFont: function(text) {
@@ -909,24 +960,23 @@
 
 			// Add any parts to the internal parts list
 			that.parts = {};
-			for (index in parts_list) {
-				part = parts_list[index];
-				if (part in _parts) {
+			$.each(parts_list, function(index, part) {
+				if (_parts[part]) {
 					that.parts[part] = new _parts[part](that);
 				}
-			}
+			});
 
 			if (!that.generated) {
 				var layout_parts = [];
 
-				for (index in that.options.layout) {
-					if (index in that.parts) {
+				$.each(that.options.layout, function(part, pos) {
+					if (that.parts[part]) {
 						layout_parts.push({
-							part: index,
-							pos: that.options.layout[index]
+							'part': part,
+							'pos':  pos
 						});
 					}
-				}
+				});
 
 				$(_layoutTable(layout_parts, function(cell, x, y) {
 					var classes = ['ui-fontpicker-' + cell.part + '-container'];
@@ -980,15 +1030,6 @@
 			var that = this;
 
 			if (!that.opened) {
-				// Automatically find highest z-index.
-				$(that.element[0]).parents().each(function() {
-					var zIndex = $(this).css('z-index');
-					if ((typeof(zIndex) === 'number' || typeof(zIndex) === 'string') && zIndex !== '' && !isNaN(zIndex)) {
-						that.dialog.css('z-index', zIndex + 1);
-						return false;
-					}
-				});
-
 				that._generate();
 
 				var offset = that.element.offset(),
@@ -997,6 +1038,21 @@
 				x -= Math.max(0, (x + that.dialog.width()) - $(window).width() + 20);
 				y -= Math.max(0, (y + that.dialog.height()) - $(window).height() + 20);
 				that.dialog.css({'left': x, 'top': y});
+
+				// Automatically find highest z-index.
+				var zIndex = 0;
+				$(that.element[0]).parents().each(function() {
+					var z = $(this).css('z-index');
+					if ((typeof(z) === 'number' || typeof(z) === 'string') && z !== '' && !isNaN(z)) {
+						zIndex = z;
+						return false;
+					}
+				});
+
+				//@todo zIndexOffset option, to raise above other elements?
+				that.dialog.css('z-index', zIndex += 2);
+
+				that.overlay = that.options.modal ? new $.ui.dialog.overlay(that) : null;
 
 				that._effectShow();
 				that.opened = true;
@@ -1012,6 +1068,7 @@
 		close: function () {
 			var that = this;
 
+			that.currentFont	= that.font.copy();
 			that.changed = false;
 
 			// tear down the interface
@@ -1022,6 +1079,10 @@
 				that.opened		= false;
 				that._callback('close');
 			});
+
+			if (that.overlay) {
+				that.overlay.destroy();
+			}
 		},
 
 		_callback: function (callback) {
@@ -1029,22 +1090,22 @@
 
 			if (that.font.set) {
 				that._trigger(callback, null, {
-					css:	that.font.toCSS(),
-					family: that.font.family,
-					weight: that.font.weight
+					style:	that.font.toCSS(),
+					css:	that.font.css
 				});
 			} else {
 				that._trigger(callback, null, {
-					css:	'',
-					family: '',
-					weight: ''
+					style:	'',
+					css:	{}
 				});
 			}
 		},
 
 		_initAllParts: function () {
 			$.each(this.parts, function (index, part) {
-				part.init();
+				if (part.init) {
+					part.init();
+				}
 			});
 		},
 
@@ -1079,9 +1140,9 @@
 						this.element.val(css);
 					}
 				}
-			}
 
-			this._setAltField();
+				this._setAltField();
+			}
 
 			if (this.opened) {
 				this._repaintAllParts();
