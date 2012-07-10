@@ -160,115 +160,118 @@
 		},
 
 		_settings = {
-			'line-height':	function (inst) {
+			'line-height':		function(fp) {
 				var that	= this;
 
 				this.paintTo = function(container) {
-                    $('<input step="5" min="0" max="9999" type="number" value=""/>').appendTo(container).change(function() {
+                    $('<input step="5" min="0" max="9999" type="number" value="'+(fp.font.css['line-height']? parseInt(fp.font.css['line-height']) : '')+'"/>')
+					.appendTo(container)
+					.change(function() {
 						var value = $(this).val();
-						inst.font.css['line-height'] = value? value+'%' : null;
-						inst._change();
+						fp.font.css['line-height'] = value? value+'%' : null;
+						fp._change();
 					}).after('%');
 				};
 
 				this.label = function() {
-					return inst._getRegional('line-height');
+					return fp._getRegional('line-height');
 				};
 			},
 
-			'small-caps':	function (inst) {
-				var that	= this;
-
-				this.paintTo = function(container) {
-                    $('<input type="checkbox"/>').appendTo(container).change(function() {
-						inst.font.css['font-variant'] = $(this).is(':checked')? 'small-caps' : null;
-						inst._change();
-					});
-				};
-
-				this.label = function() {
-					return inst._getRegional('small-caps');
-				};
-			},
-
-			'underline':	function (inst) {
+			'small-caps':		function(fp) {
 				var that	= this;
 
 				this.paintTo = function(container) {
                     $('<input type="checkbox"/>')
-					.attr('checked', _hasWord(inst.font.css['text-decoration'], 'underline'))
+					.attr('checked', _hasWord(fp.font.css['font-variant'], 'small-caps'))
 					.appendTo(container)
 					.change(function() {
-						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'underline', $(this).is(':checked'));
-						inst._change();
+						fp.font.css['font-variant'] = $(this).is(':checked')? 'small-caps' : null;
+						fp._change();
 					});
 				};
 
 				this.label = function() {
-					return inst._getRegional('underline');
+					return fp._getRegional('small-caps');
 				};
 			},
 
-			'overline':	function (inst) {
+			'underline':		function(fp) {
 				var that	= this;
 
 				this.paintTo = function(container) {
                     $('<input type="checkbox"/>')
-					.attr('checked', _hasWord(inst.font.css['text-decoration'], 'overline'))
+					.attr('checked', _hasWord(fp.font.css['text-decoration'], 'underline'))
 					.appendTo(container)
 					.change(function() {
-						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'overline', $(this).is(':checked'));
-						inst._change();
+						fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'underline', $(this).is(':checked'));
+						fp._change();
 					});
 				};
 
 				this.label = function() {
-					return inst._getRegional('overline');
+					return fp._getRegional('underline');
 				};
 			},
 
-			'line-through':	function (inst) {
+			'overline':			function(fp) {
 				var that	= this;
 
 				this.paintTo = function(container) {
                     $('<input type="checkbox"/>')
-					.attr('checked', _hasWord(inst.font.css['text-decoration'], 'line-through'))
+					.attr('checked', _hasWord(fp.font.css['text-decoration'], 'overline'))
 					.appendTo(container)
 					.change(function() {
-						inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
-						inst._change();
+						fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'overline', $(this).is(':checked'));
+						fp._change();
 					});
 				};
 
 				this.label = function() {
-					return inst._getRegional('line-through');
+					return fp._getRegional('overline');
 				};
 			},
 
-			'letter-spacing':	function (inst) {
+			'line-through':		function(fp) {
+				var that	= this;
+
+				this.paintTo = function(container) {
+                    $('<input type="checkbox"/>')
+					.attr('checked', _hasWord(fp.font.css['text-decoration'], 'line-through'))
+					.appendTo(container)
+					.change(function() {
+						fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
+						fp._change();
+					});
+				};
+
+				this.label = function() {
+					return fp._getRegional('line-through');
+				};
+			},
+
+			'letter-spacing':	function(fp) {
 				var that	= this,
 					input	= null;
 
 				this.paintTo = function(container) {
-                    input = $('<input type="number" min="-999" max="9999" value=""/>').appendTo(container);
-					//input.after('px');
-					input.after('%');
-
-					input.change( function() {
+                    $('<input min="-999" max="999" type="number" value="'+(fp.font.css['letter-spacing']? parseInt(fp.font.css['letter-spacing']) : '')+'"/>')
+					.appendTo(container)
+					.change( function() {
 						var value = $(this).val();
-						inst.font.css['letter-spacing'] = value && value != 0? value+'px' : null;
-						inst._change();
-					});
+						fp.font.css['letter-spacing'] = value && value != 0? value+'px' : null;
+						fp._change();
+					}).after('px');
 				};
 
 				this.label = function() {
-					return inst._getRegional('letter-spacing');
+					return fp._getRegional('letter-spacing');
 				};
 			}
 		},
 
         _parts = {
-            header: function (inst) {
+            header: function(inst) {
                 var that = this,
                     e = null,
                     _html;
@@ -295,7 +298,7 @@
                 };
             },
 
-            family: function (inst) {
+            family: function(inst) {
                 var that		= this,
                     e			= null,
                     _html		= function () {
@@ -351,7 +354,7 @@
 				};
             },
 
-            style: function (inst) {
+            style: function(inst) {
                 var that	= this,
                     e		= null,
                     _html	= function () {
@@ -400,7 +403,7 @@
 				};
             },
 
-            size: function (inst) {
+            size: function(inst) {
                 var that	= this,
                     e		= null,
                     _html	= function () {
@@ -443,7 +446,7 @@
 				};
             },
 
-            settings: function (inst) {
+            settings: function(inst) {
                 var that		= this,
                     e			= null,
                     _html		= function () {
@@ -490,7 +493,7 @@
                 };
             },
 
-            preview: function (inst) {
+            preview: function(inst) {
                 var that = this,
                     e = null,
                     _html;
@@ -519,7 +522,7 @@
 				};
             },
 
-            footer: function (inst) {
+            footer: function(inst) {
                 var that = this,
                     e = null,
 					id_none = 'ui-fontpicker-special-none-'+_fontpicker_index,
@@ -569,8 +572,8 @@
             }
         },
 
-        Font = function () {
-			this.toCSS = function() {
+        Font = function(style) {
+			this.toCSS	= function() {
 				var css = '';
 				$.each(this.css, function(tag, value) {
 					if (value !== null) {
@@ -590,19 +593,63 @@
 				return css;
 			};
 
-			this.set		= false;
-
-			this.css		= {
-//				'font-family':		null
-//			,	'font-size':		null
-//			,	'color':			null
-//			,	'text-decoration':	null
-//			,	'letter-spacing':	null
-//			,	'font-weight':		null
-//			,	'font-style':		null
-//			,	'line-height':		null
-//			,	'font-variant':		null
+			this.copy	= function() {
+				return $.extend(true, {}, this);
 			};
+
+			this.set	= false;
+
+			this.css	= {};
+
+			var font = this;
+
+			//@todo this.font = _parseFont(text); //@todo parseFont from text (css-like?) return Font object
+			var shell = $('<div>').appendTo('body');
+			var item = $('<div style="'+style+'"/>').appendTo(shell);
+
+			var results = {};
+
+			// Compare-to-normal, unchanged
+			$.each({
+				'text-decoration':	'none'
+			,	'font-weight':		'normal'
+			,	'font-style':		'normal'
+			,	'font-variant':		'normal'
+			,	'letter-spacing':	'normal'
+			}, function(tag, value) {
+				shell.css(tag, value);
+				var actual = item.css(tag);
+				if (actual != value) {
+					font.css[tag] = actual;
+				}
+			});
+
+			// Compare-to-normal, percentage-to-fontsize
+			$.each({
+				'line-height':		'normal'
+			}, function(tag, value) {
+				shell.css(tag, value);
+				var actual = item.css(tag);
+				if (actual != value) {
+					font.css[tag] = parseInt(parseInt(actual) * 100 / parseInt(item.css('font-size')))+'%';
+				}
+			});
+
+			// Detect non-change
+			$.each({
+				'font-family':		[ 'sans-serif', 'serif' ]
+			,	'font-size':		[ '10px', '20px' ]
+			,	'color':			[ 'black', 'white' ]
+			}, function(tag, values) {
+				shell.css(tag, values[0]);
+				var actual = item.css(tag);
+				shell.css(tag, values[1]);
+				if (actual == item.css(tag)) {
+					font.css[tag] = actual;
+				}
+			});
+
+			shell.remove();
 		};
 
 	$.widget("vanderlee.fontpicker", {
@@ -874,62 +921,23 @@
 		_setFont: function(style) {
 			var that = this;
 
-            that.font			= new Font();
+            that.font = new Font(style);
 
-			var normal_tests = {
-				'text-decoration':	'none'
-			,	'letter-spacing':	'normal'
-			,	'font-weight':		'normal'
-			,	'font-style':		'normal'
-			,	'line-height':		'normal'
-			,	'font-variant':		'normal'
-			};
-
-			var inherit_tests = {
-				'font-family':		[ 'sans-serif', 'serif' ]
-			,	'font-size':		[ '10px', '20px' ]
-			,	'color':			[ 'black', 'white' ]
-			};
-
-			//@todo this.font = _parseFont(text); //@todo parseFont from text (css-like?) return Font object
-			var shell = $('<div>').appendTo('body');
-			var item = $('<div style="'+style+'"/>').appendTo(shell);
-
-			var results = {};
-
-			$.each(normal_tests, function(tag, value) {
-				shell.css(tag, value);
-				var actual = item.css(tag);
-				if (actual != value) {
-					that.font.css[tag] = actual;
-				}
-			});
-
-			$.each(inherit_tests, function(tag, values) {
-				shell.css(tag, values[0]);
-				var actual = item.css(tag);
-				shell.css(tag, values[1]);
-				if (actual == item.css(tag)) {
-					if (tag == 'font-family') {
-						var faces = actual.split(/,/);
-						actual = null;
-						$.each(faces, function(index, face) {
-							face = $.trim(face.replace(/^(['"])(.*)\1$/, '$2'));
-							$.each(that.options.families, function(index, family) {
-								if (face == family.name) {
-									actual = family.faces;
-									return false;
-								}
-							});
-							return actual === null;
-						});
-					}
-
-					that.font.css[tag] = actual;
-				}
-			});
-
-			shell.remove();
+			if (that.font.css['font-family']) {
+				var faces = that.font.css['font-family'].split(/,/);
+				var found = false;
+				$.each(faces, function(index, face) {
+					face = $.trim(face.replace(/^(['"])(.*)\1$/, '$2'));
+					$.each(that.options.families, function(index, family) {
+						if (face == family.name) {
+							that.font.css['font-family'] = family.faces;
+							found = true;
+							return !found;
+						}
+					});
+					return !found;
+				});
+			}
 		},
 
 		setFont: function(text) {
@@ -944,8 +952,7 @@
 				parts_list;
 
 			// Set font based on element?
-			//that._setFont(that.inline? that.options.font : that.element.val());
-			//@todo Re-parse font from textbox/options?
+			that._setFont(that.inline? that.options.font : that.element.val());
 
 			// Determine the parts to include in this fontpicker
 			if (typeof that.options.parts === 'string') {

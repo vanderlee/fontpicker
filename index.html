@@ -35,7 +35,7 @@
 					altOnChange:	true,
 					regional:		'nl',
 					select:			function(event, font) {
-										console.debug('Select: '+font.css);
+										console.debug('Select: '+font.style);
 									}
                 });
             });
@@ -48,7 +48,14 @@
 
 		<hr/>
 
-        Basic popup: <input type="color" id="fp-basic" value="Arial"/>
+        Basic popup: <input id="fp-basic" value="
+			font-family: 'Lucida Console', Arial;
+			font-size: 21px;
+			text-decoration: overline line-through;
+			line-height: 200%;
+			font-variant: small-caps;
+			letter-spacing: 2px;
+			font-style: italic;"/>
 
 		<hr/>
 

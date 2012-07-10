@@ -1,4 +1,7 @@
-Parse from CSS text tags (cheat?)
+Parse from CSS text tags
+	line-height
+	letter-spacing
+	color? -> what format(s)???
 Parse from DOM element properties
 Font color support
 Normalize font options; all to simple format.
