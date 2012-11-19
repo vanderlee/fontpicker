@@ -5,7 +5,6 @@
 		<!-- jQuery/jQueryUI (hosted) -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>
-		<script src="http://jqueryui.com/themeroller/themeswitchertool/"></script>
 		<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" type="text/css"/>
 		<!--link href="aristo/Aristo.css" rel="stylesheet" type="text/css"/-->
         <style>
@@ -13,37 +12,12 @@
 				font-family:	'Segoe UI', Verdana, Arial, Helvetica, sans-serif;
 				font-size:		62.5%;
 			}
-
-			#switcher {
-				float: 			right;
-				display: 		inline-block;
-			}
         </style>
 		<script src="jquery.fontpicker.js"></script>
 		<link href="jquery.fontpicker.css" rel="stylesheet" type="text/css"/>
 		<script src="i18n/jquery.ui.fontpicker-nl.js"></script>
-        <script>
-           	$( function() {
-				$('#switcher').themeswitcher();
-
-                $('#fp-basic').fontpicker({
-					showNoneButton: true
-                });
-
-                $('#fp-inline').fontpicker({
-					altField:		'#fp-inline-alt',
-					altOnChange:	true,
-					regional:		'nl',
-					select:			function(event, font) {
-										console.debug('Select: '+font.style);
-									}
-                });
-            });
-        </script>
     </head>
     <body>
-        <div id="switcher"></div>
-
 		<button id="fp-button-disable">Disable</button><button id="fp-button-enable">Enable</button>
 
 		<hr/>
@@ -56,11 +30,39 @@
 			font-variant: small-caps;
 			letter-spacing: 2px;
 			font-style: italic;"/>
+        <script>
+           	$(function() {
+                $('#fp-basic').fontpicker({
+					showNoneButton: true
+                });
+            });
+        </script>
 
 		<hr/>
 
 		Inline: <div id="fp-inline"></div>
 		<div id="fp-inline-alt">Quirky example of altField</div>
+        <script>
+           	$(function() {
+                $('#fp-inline').fontpicker({
+					altField:		'#fp-inline-alt',
+					altOnChange:	true,
+					regional:		'nl',
+					select:			function(event, font) {
+										console.debug('Select: '+font.style);
+									}
+                });
+            });
+        </script>
+
+		<hr/>
+
+		Popup content-div: <div id="fp-content" style="font-family: Verdana; font-size: 20px;">Text goes right here!</div>
+        <script>
+           	$(function() {
+                $('#fp-content').fontpicker();
+            });
+        </script>
 
     </body>
 </html>
