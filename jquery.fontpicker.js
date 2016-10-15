@@ -1,10 +1,10 @@
 /*jslint devel: true, bitwise: true, regexp: true, browser: true, confusion: true, unparam: true, eqeq: true, white: true, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
-/*globals jQuery */
+/*globals jQuery,Font */
 
 /*
  * FontPicker
  *
- * Copyright (c) 2011-2012 Martijn W. van der Lee
+ * Copyright (c) 2011-2013 Martijn W. van der Lee
  * Licensed under the MIT.
  *
  * Full-featured fontpicker for jQueryUI with full theming support.
@@ -12,41 +12,13 @@
  * Sourcecode created from scratch by Martijn W. van der Lee.
  */
 
-(function ($) {
+;(function ($) {
 	"use strict";
-
-	$.fontpicker = new function() {
-		this.regional = [];
-		this.regional[''] =	{
-			'ok':				'OK',
-			'cancel':			'Cancel',
-			'none':				'None',
-			'button':			'Font',
-			'title':			'Pick a font',
-			'family':			'Family:',
-			'style':			'Style:',
-			'size':				'Size:',
-			'line-height':		'Line height',
-			'letter-spacing':	'Letter spacing',
-			'small-caps':		'Small caps',
-			'underline':		'Underline',
-			'overline':			'Overline',
-			'line-through':		'Strike through',
-			previewText:	'The quick brown fox jumps\nover the lazy dog.'
-		};
-	};
 
 	var _fontpicker_index = 0,
 
 		_container_popup = '<div class="ui-fontpicker ui-fontpicker-dialog ui-dialog ui-widget ui-widget-content ui-corner-all" style="display: none;"></div>',
-
 		_container_inline = '<div class="ui-fontpicker ui-fontpicker-inline ui-dialog ui-widget ui-widget-content ui-corner-all"></div>',
-
-		_parts_lists = {
-			'full':		['header', 'family', 'style', 'size', 'settings', 'preview', 'footer'],
-			'popup':	['family', 'style', 'size', 'settings', 'preview', 'footer'],
-			'inline':	['family', 'style', 'size', 'settings', 'preview']
-		},
 
 		_is_numeric = function(value) {
 			return (typeof(value) === 'number' || typeof(value) === 'string') && value !== '' && !isNaN(value);
@@ -105,7 +77,8 @@
 			cell = layout[index = 0];
 			for (y = 0; y < height; ++y) {
 				html += '<tr>';
-				for (x = 0; x < width; x) {
+                x = 0;
+                while (x < width) {
 					if (typeof cell !== 'undefined' && x == cell.pos[0] && y == cell.pos[1]) {
 						// Create a "real" cell
 						html += callback(cell, x, y);
@@ -143,7 +116,7 @@
 
 			return '<table cellspacing="0" cellpadding="0" border="0"><tbody>' + html + '</tbody></table>';
 		},
-
+		
 		_setWord = function(sentence, word, set) {
 			var words = sentence? sentence.split(' ') : [];
 			var index = $.inArray(word, words);
@@ -269,22 +242,46 @@
 					return fp._getRegional('letter-spacing');
 				};
 			}
-		},
+		};
 
-        _parts = {
+	$.fontpicker = new function() {
+		this.regional = [];
+		this.regional[''] =	{
+			'ok':				'OK',
+			'cancel':			'Cancel',
+			'none':				'None',
+			'button':			'Font',
+			'title':			'Pick a font',
+			'family':			'Family:',
+			'style':			'Style:',
+			'size':				'Size:',
+			'line-height':		'Line height',
+			'letter-spacing':	'Letter spacing',
+			'small-caps':		'Small caps',
+			'underline':		'Underline',
+			'overline':			'Overline',
+			'line-through':		'Strike through',
+			previewText:	'The quick brown fox jumps\nover the lazy dog.'
+		};
+
+		this.partslists = {
+			'full':		['header', 'family', 'style', 'size', 'settings', 'preview', 'footer'],
+			'popup':	['family', 'style', 'size', 'settings', 'preview', 'footer'],
+			'inline':	['family', 'style', 'size', 'settings', 'preview']
+		};
+
+        this.parts = {
             header: function(inst) {
-                var that = this,
-                    e = null,
-                    _html;
+                var that	= this,
+                    e		= null,
+                    _html	= function () {
+						var title = inst.options.title ? inst.options.title :  inst._getRegional('title');
 
-                _html = function () {
-                    var title = inst.options.title ? inst.options.title :  inst._getRegional('title');
-
-                    return '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">'
-                        + '<span class="ui-dialog-title">' + title + '</span>'
-                        + '<a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button">'
-                        + '<span class="ui-icon ui-icon-closethick">close</span></a></div>';
-                };
+						return '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">'
+							+ '<span class="ui-dialog-title">' + title + '</span>'
+							+ '<a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button">'
+							+ '<span class="ui-icon ui-icon-closethick">close</span></a></div>';
+					};
 
                 this.init = function () {
                     e = $(_html()).prependTo(inst.dialog);
@@ -562,16 +559,16 @@
                         inst.close();
                     });
 
-                    $('.ui-fontpicker-buttonset', e).buttonset();
+                    $('.ui-fontpicker-buttonset', e)[$.fn.controlgroup ? 'controlgroup' : 'buttonset']();
 
                     $('#'+id_none, e).click(function () {
                         inst._change(false);
                     });
                 };
             }
-        },
+        };
 
-        Font = function(style) {
+        this.Font = function(style) {
 			this.toCSS	= function() {
 				var css = '';
 				$.each(this.css, function(tag, value) {
@@ -612,8 +609,10 @@
 				return style;
 			};
 
-			this.copy	= function() {
-				return $.extend(true, {}, this);
+			this.copy = function() {
+				var font = new $.fontpicker.Font(this.style);
+				font.set = this.set;
+				return font;
 			};
 
 			this.set	= false;
@@ -674,6 +673,7 @@
 
 			shell.remove();
 		};
+	};
 
 	$.widget("vanderlee.fontpicker", {
 		options: {
@@ -782,7 +782,7 @@
 
 			++_fontpicker_index;
 
-			that.widgetEventPrefix = 'font';
+			that.widgetEventPrefix = 'fontpicker';
 
 			that.opened		= false;
 			that.generated	= false;
@@ -936,7 +936,7 @@
 				found = false,
 				faces;
 
-            that.font = new Font(style);
+            that.font = new $.fontpicker.Font(style);
 
 			if (that.font.css['font-family']) {
 				faces = that.font.css['font-family'].split(/,/);
@@ -993,11 +993,11 @@
 
 			// Determine the parts to include in this fontpicker
 			if (typeof that.options.parts === 'string') {
-				if (that.options.parts in _parts_lists) {
-					parts_list = _parts_lists[that.options.parts];
+				if (that.options.parts in $.fontpicker.partslists) {
+					parts_list = $.fontpicker.partslists[that.options.parts];
 				} else {
 					// automatic
-					parts_list = _parts_lists[that.inline ? 'inline' : 'popup'];
+					parts_list = $.fontpicker.partslists[that.inline ? 'inline' : 'popup'];
 				}
 			} else {
 				parts_list = that.options.parts;
@@ -1006,8 +1006,8 @@
 			// Add any parts to the internal parts list
 			that.parts = {};
 			$.each(parts_list, function(index, part) {
-				if (_parts[part]) {
-					that.parts[part] = new _parts[part](that);
+				if ($.fontpicker.parts[part]) {
+					that.parts[part] = new $.fontpicker.parts[part](that);
 				}
 			});
 
@@ -1258,5 +1258,4 @@
 				$.fontpicker.regional[this.options.regional][name] : $.fontpicker.regional[''][name];
         }
 	});
-
 }(jQuery));

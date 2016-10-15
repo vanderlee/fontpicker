@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <title>jQuery Fontpicker</title>
+		<!-- jQuery/jQueryUI (hosted) -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>
+		<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" type="text/css"/>
+        <style>
+			body {
+				font-family:	'Segoe UI', Verdana, Arial, Helvetica, sans-serif;
+				font-size:		62.5%;
+			}
+        </style>
+		<script>
+			$.fontpicker = new function() {
+				this.families = [];
+			};
+
+			var Font = function() {
+				var	that		= this,
+					args		= arguments;
+
+				this.set		= false;
+				this.size		= null;
+				this.family		= null;
+				this.color		= null;
+				this.lineheight	= null;	// %
+
+				this.toCSS	= function() {
+					var css = {};
+
+					if (that.size)			css['font-size']	= that.size;
+					if (that.family)		css['font-family']	= that.family;
+					if (that.color)			css['color']		= that.color;
+					if (that.lineheight)	css['line-height']	= 0.01231 * that.lineheight;
+
+					return css;
+				};
+			
+				this.copy = function() {
+					var font = new $.fontpicker.Font({
+						size:		that.size,
+						family:		that.family,
+						color:		that.color,
+						lineheight:	that.lineheight
+					});
+					font.set = that.set;
+					return font;
+				};
+
+				// Construct
+				if ($.isPlainObject(args[0])) {
+					$.each(args[0], function(property, value) {
+						switch (property) {
+							case 'font-size':
+							case 'fontsize':
+							case 'size':
+								that.size		= value;
+								break;
+
+							case 'font-family':
+							case 'fontfamily':
+							case 'family':
+								that.family		= value;
+								break;
+
+							case 'color':
+								that.color		= value;
+								break;
+
+							case 'line-height':
+								that.lineheight = value;
+								break;
+						}
+					});
+				}
+			};
+
+			$(function() {
+				var f = new Font({
+					size:			14
+				,	family:			'arial'
+				,	color:			'blue'
+				,	'line-height':	'normal'
+				});
+
+				$('#test').css(f.toCSS());
+			});
+		</script>
+
+    </head>
+    <body>
+		<div id="test">The quick brown fox jumps over the lazy dog</div>
+    </body>
+</html>
