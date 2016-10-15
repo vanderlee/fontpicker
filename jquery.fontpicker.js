@@ -131,9 +131,9 @@
 			_settings = {
 				'line-height': function (fp) {
 					var that = this,
-						id = 'ui-fontpicker-settings-lineheight';
+							id = 'ui-fontpicker-settings-lineheight';
 
-					this.id = function() {
+					this.id = function () {
 						return id;
 					}
 
@@ -156,7 +156,7 @@
 					var that = this,
 							id = 'ui-fontpicker-settings-smallcaps';
 
-					this.id = function() {
+					this.id = function () {
 						return id;
 					}
 
@@ -179,7 +179,7 @@
 					var that = this,
 							id = 'ui-fontpicker-settings-underline';
 
-					this.id = function() {
+					this.id = function () {
 						return id;
 					}
 
@@ -202,7 +202,7 @@
 					var that = this,
 							id = 'ui-fontpicker-settings-overline';
 
-					this.id = function() {
+					this.id = function () {
 						return id;
 					}
 
@@ -225,7 +225,7 @@
 					var that = this,
 							id = 'ui-fontpicker-settings-linethrough';
 
-					this.id = function() {
+					this.id = function () {
 						return id;
 					}
 
@@ -249,7 +249,7 @@
 							id = 'ui-fontpicker-settings-letterspacing',
 							input = null;
 
-					this.id = function() {
+					this.id = function () {
 						return id;
 					}
 
