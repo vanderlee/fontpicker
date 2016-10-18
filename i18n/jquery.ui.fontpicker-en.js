@@ -8,6 +8,6 @@ jQuery(function($) {
 		family:			'Family:',
 		style:			'Style:',
 		size:			'Size:',
-		previewText:	'The quick brown fox jumps\nover the lazy dog.'
+		preview:		'The quick brown fox jumps\nover the lazy dog.'
 	};
 });

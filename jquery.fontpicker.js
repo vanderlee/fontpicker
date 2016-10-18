@@ -1,43 +1,209 @@
 /*jslint devel: true, bitwise: true, regexp: true, browser: true, confusion: true, unparam: true, eqeq: true, white: true, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
-/*globals jQuery,Font */
+/*globals jQuery,Font,define */
 
-/*
+/*!
  * FontPicker
  *
- * Copyright (c) 2011-2013 Martijn W. van der Lee
+ * Copyright (c) 2011-2016 Martijn W. van der Lee
  * Licensed under the MIT.
- *
- * Full-featured fontpicker for jQueryUI with full theming support.
+ */
+/* Full-featured fontpicker for jQueryUI with full theming support.
  * Most images from jPicker by Christopher T. Tillman.
  * Sourcecode created from scratch by Martijn W. van der Lee.
  */
 
-;
-(function ($) {
+(function (factory) {
+	if (typeof define === "function" && define.amd) {
+
+		// AMD. Register as an anonymous module.
+		define([
+			"jquery"
+		], factory);
+	} else {
+
+		// Browser globals
+		factory(jQuery);
+	}
+}(function ($) {
 	"use strict";
 
 	var _fontpicker_index = 0,
-			_container_popup = '<div class="ui-fontpicker ui-fontpicker-dialog ui-dialog ui-widget ui-widget-content ui-corner-all" style="display: none;"></div>',
-			_container_inline = '<div class="ui-fontpicker ui-fontpicker-inline ui-dialog ui-widget ui-widget-content ui-corner-all"></div>',
-			_is_numeric = function (value) {
-				return (typeof (value) === 'number' || typeof (value) === 'string') && value !== '' && !isNaN(value);
+	
+		_container_popup = '<div class="ui-fontpicker ui-fontpicker-dialog ui-dialog ui-widget ui-widget-content ui-corner-all" style="display: none;"></div>',
+		_container_inlineFrame = '<div class="ui-fontpicker ui-fontpicker-inline ui-dialog ui-widget ui-widget-content ui-corner-all"></div>',
+		_container_inline = '<div class="ui-fontpicker ui-fontpicker-inline"></div>',
+
+		_setWord = function (sentence, word, set) {
+			var words = sentence ? sentence.split(' ') : [];
+			var index = $.inArray(word, words);
+			if (set && index < 0) {
+				words.push(word);
+			} else if (!set && index >= 0) {
+				words.splice(index, 1);
+			}
+			return words.length > 0 ? words.join(' ') : null;
+		},
+		
+		_hasWord = function (sentence, word) {
+			var r = new RegExp('\\b' + word + '\\b', 'i');
+			return r.test(sentence);
+		},
+		
+		_settings = {
+			'line-height': function (fp) {
+				var that = this,
+						id = 'ui-fontpicker-settings-lineheight';
+
+				this.id = function () {
+					return id;
+				}
+
+				this.paintTo = function (container) {
+					$('<input id="' + id + '" step="5" min="0" max="9999" type="number" value="' + (fp.font.css['line-height'] ? parseInt(fp.font.css['line-height']) : '') + '"/>')
+							.appendTo(container)
+							.change(function () {
+								var value = $(this).val();
+								fp.font.css['line-height'] = value ? value + '%' : null;
+								fp._change();
+							}).after('%');
+				};
+
+				this.label = function () {
+					return fp._getRegional('line-height');
+				};
 			},
-			_layoutTable = function (layout, callback) {
+
+			'small-caps': function (fp) {
+				var that = this,
+						id = 'ui-fontpicker-settings-smallcaps';
+
+				this.id = function () {
+					return id;
+				}
+
+				this.paintTo = function (container) {
+					$('<input id="' + id + '" type="checkbox"/>')
+							.attr('checked', _hasWord(fp.font.css['font-variant'], 'small-caps'))
+							.appendTo(container)
+							.change(function () {
+								fp.font.css['font-variant'] = $(this).is(':checked') ? 'small-caps' : null;
+								fp._change();
+							});
+				};
+
+				this.label = function () {
+					return fp._getRegional('small-caps');
+				};
+			},
+
+			'underline': function (fp) {
+				var that = this,
+						id = 'ui-fontpicker-settings-underline';
+
+				this.id = function () {
+					return id;
+				}
+
+				this.paintTo = function (container) {
+					$('<input id="' + id + '" type="checkbox"/>')
+							.attr('checked', _hasWord(fp.font.css['text-decoration'], 'underline'))
+							.appendTo(container)
+							.change(function () {
+								fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'underline', $(this).is(':checked'));
+								fp._change();
+							});
+				};
+
+				this.label = function () {
+					return fp._getRegional('underline');
+				};
+			},
+
+			'overline': function (fp) {
+				var that = this,
+						id = 'ui-fontpicker-settings-overline';
+
+				this.id = function () {
+					return id;
+				}
+
+				this.paintTo = function (container) {
+					$('<input id="' + id + '" type="checkbox"/>')
+							.attr('checked', _hasWord(fp.font.css['text-decoration'], 'overline'))
+							.appendTo(container)
+							.change(function () {
+								fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'overline', $(this).is(':checked'));
+								fp._change();
+							});
+				};
+
+				this.label = function () {
+					return fp._getRegional('overline');
+				};
+			},
+
+			'line-through': function (fp) {
+				var that = this,
+						id = 'ui-fontpicker-settings-linethrough';
+
+				this.id = function () {
+					return id;
+				}
+
+				this.paintTo = function (container) {
+					$('<input id="' + id + '" type="checkbox"/>')
+							.attr('checked', _hasWord(fp.font.css['text-decoration'], 'line-through'))
+							.appendTo(container)
+							.change(function () {
+								fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
+								fp._change();
+							});
+				};
+
+				this.label = function () {
+					return fp._getRegional('line-through');
+				};
+			},
+
+			'letter-spacing': function (fp) {
+				var that = this,
+						id = 'ui-fontpicker-settings-letterspacing',
+						input = null;
+
+				this.id = function () {
+					return id;
+				}
+
+				this.paintTo = function (container) {
+					$('<input id="' + id + '" min="-999" max="999" type="number" value="' + (fp.font.css['letter-spacing'] ? parseInt(fp.font.css['letter-spacing']) : '') + '"/>')
+							.appendTo(container)
+							.change(function () {
+								var value = $(this).val();
+								fp.font.css['letter-spacing'] = value && value != 0 ? value + 'px' : null;
+								fp._change();
+							}).after('px');
+				};
+
+				this.label = function () {
+					return fp._getRegional('letter-spacing');
+				};
+			}
+		},
+		
+		_layoutTable = function (layout, callback) {
 				var bitmap,
-						x,
-						y,
+						x, y,
 						width, height,
 						columns, rows,
 						index,
 						cell,
 						html,
-						w,
-						h,
+						w, h,
 						colspan,
 						walked;
 
 				layout.sort(function (a, b) {
-					if (a.pos[1] == b.pos[1]) {
+					if (a.pos[1] === b.pos[1]) {
 						return a.pos[0] - b.pos[0];
 					}
 					return a.pos[1] - b.pos[1];
@@ -77,7 +243,7 @@
 					html += '<tr>';
 					x = 0;
 					while (x < width) {
-						if (typeof cell !== 'undefined' && x == cell.pos[0] && y == cell.pos[1]) {
+						if (typeof cell !== 'undefined' && x === cell.pos[0] && y === cell.pos[1]) {
 							// Create a "real" cell
 							html += callback(cell, x, y);
 
@@ -94,7 +260,7 @@
 							colspan = 0;
 							walked = false;
 
-							while (x < width && bitmap[x][y] === undefined && (cell === undefined || y < cell.pos[1] || (y == cell.pos[1] && x < cell.pos[0]))) {
+							while (x < width && bitmap[x][y] === undefined && (cell === undefined || y < cell.pos[1] || (y === cell.pos[1] && x < cell.pos[0]))) {
 								if (columns[x] === true) {
 									colspan += 1;
 								}
@@ -113,180 +279,27 @@
 				}
 
 				return '<table cellspacing="0" cellpadding="0" border="0"><tbody>' + html + '</tbody></table>';
-			},
-			_setWord = function (sentence, word, set) {
-				var words = sentence ? sentence.split(' ') : [];
-				var index = $.inArray(word, words);
-				if (set && index < 0) {
-					words.push(word);
-				} else if (!set && index >= 0) {
-					words.splice(index, 1);
-				}
-				return words.length > 0 ? words.join(' ') : null;
-			},
-			_hasWord = function (sentence, word) {
-				var r = new RegExp('\\b' + word + '\\b', 'i');
-				return r.test(sentence);
-			},
-			_settings = {
-				'line-height': function (fp) {
-					var that = this,
-							id = 'ui-fontpicker-settings-lineheight';
-
-					this.id = function () {
-						return id;
-					}
-
-					this.paintTo = function (container) {
-						$('<input id="' + id + '" step="5" min="0" max="9999" type="number" value="' + (fp.font.css['line-height'] ? parseInt(fp.font.css['line-height']) : '') + '"/>')
-								.appendTo(container)
-								.change(function () {
-									var value = $(this).val();
-									fp.font.css['line-height'] = value ? value + '%' : null;
-									fp._change();
-								}).after('%');
-					};
-
-					this.label = function () {
-						return fp._getRegional('line-height');
-					};
-				},
-
-				'small-caps': function (fp) {
-					var that = this,
-							id = 'ui-fontpicker-settings-smallcaps';
-
-					this.id = function () {
-						return id;
-					}
-
-					this.paintTo = function (container) {
-						$('<input id="' + id + '" type="checkbox"/>')
-								.attr('checked', _hasWord(fp.font.css['font-variant'], 'small-caps'))
-								.appendTo(container)
-								.change(function () {
-									fp.font.css['font-variant'] = $(this).is(':checked') ? 'small-caps' : null;
-									fp._change();
-								});
-					};
-
-					this.label = function () {
-						return fp._getRegional('small-caps');
-					};
-				},
-
-				'underline': function (fp) {
-					var that = this,
-							id = 'ui-fontpicker-settings-underline';
-
-					this.id = function () {
-						return id;
-					}
-
-					this.paintTo = function (container) {
-						$('<input id="' + id + '" type="checkbox"/>')
-								.attr('checked', _hasWord(fp.font.css['text-decoration'], 'underline'))
-								.appendTo(container)
-								.change(function () {
-									fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'underline', $(this).is(':checked'));
-									fp._change();
-								});
-					};
-
-					this.label = function () {
-						return fp._getRegional('underline');
-					};
-				},
-
-				'overline': function (fp) {
-					var that = this,
-							id = 'ui-fontpicker-settings-overline';
-
-					this.id = function () {
-						return id;
-					}
-
-					this.paintTo = function (container) {
-						$('<input id="' + id + '" type="checkbox"/>')
-								.attr('checked', _hasWord(fp.font.css['text-decoration'], 'overline'))
-								.appendTo(container)
-								.change(function () {
-									fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'overline', $(this).is(':checked'));
-									fp._change();
-								});
-					};
-
-					this.label = function () {
-						return fp._getRegional('overline');
-					};
-				},
-
-				'line-through': function (fp) {
-					var that = this,
-							id = 'ui-fontpicker-settings-linethrough';
-
-					this.id = function () {
-						return id;
-					}
-
-					this.paintTo = function (container) {
-						$('<input id="' + id + '" type="checkbox"/>')
-								.attr('checked', _hasWord(fp.font.css['text-decoration'], 'line-through'))
-								.appendTo(container)
-								.change(function () {
-									fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
-									fp._change();
-								});
-					};
-
-					this.label = function () {
-						return fp._getRegional('line-through');
-					};
-				},
-
-				'letter-spacing': function (fp) {
-					var that = this,
-							id = 'ui-fontpicker-settings-letterspacing',
-							input = null;
-
-					this.id = function () {
-						return id;
-					}
-
-					this.paintTo = function (container) {
-						$('<input id="' + id + '" min="-999" max="999" type="number" value="' + (fp.font.css['letter-spacing'] ? parseInt(fp.font.css['letter-spacing']) : '') + '"/>')
-								.appendTo(container)
-								.change(function () {
-									var value = $(this).val();
-									fp.font.css['letter-spacing'] = value && value != 0 ? value + 'px' : null;
-									fp._change();
-								}).after('px');
-					};
-
-					this.label = function () {
-						return fp._getRegional('letter-spacing');
-					};
-				}
 			};
 
 	$.fontpicker = new function () {
-		this.regional = [];
-		this.regional[''] = {
-			'ok': 'OK',
-			'cancel': 'Cancel',
-			'none': 'None',
-			'button': 'Font',
-			'title': 'Pick a font',
-			'family': 'Family:',
-			'style': 'Style:',
-			'size': 'Size:',
-			'line-height': 'Line height',
-			'letter-spacing': 'Letter spacing',
-			'small-caps': 'Small caps',
-			'underline': 'Underline',
-			'overline': 'Overline',
-			'line-through': 'Strike through',
-			previewText: 'The quick brown fox jumps\nover the lazy dog.'
+		this.regional = {
+			'': {
+				'ok': 'OK',
+				'cancel': 'Cancel',
+				'none': 'None',
+				'button': 'Font',
+				'title': 'Pick a font',
+				'family': 'Family:',
+				'style': 'Style:',
+				'size': 'Size:',
+				'line-height': 'Line height',
+				'letter-spacing': 'Letter spacing',
+				'small-caps': 'Small caps',
+				'underline': 'Underline',
+				'overline': 'Overline',
+				'line-through': 'Strike through',
+				'preview': 'The quick brown fox jumps\nover the lazy dog.'
+			}
 		};
 
 		this.partslists = {
@@ -482,7 +495,7 @@
 					inst.settings = {};
 					$.each(inst.options.settings, function (label, settings) {
 						var columns = 3,
-								id = 'ui-fontpicker-settings-' + label.toLowerCase() + '-' + _fontpicker_index,
+								id = 'ui-fontpicker-settings-' + label.toLowerCase() + '-' + inst.fontpicker_index,
 								page = $('<div id="' + id + '"></div>').appendTo(e),
 								chunk_size = Math.ceil(settings.length / columns),
 								chunks = [].concat.apply([],
@@ -523,8 +536,7 @@
 						_html;
 
 				_html = function () {
-					var text = inst.options.previewText || inst._getRegional('previewText');
-					text = text.replace('\n', '<br/>');
+					var text = (inst.options.preview || inst._getRegional('preview')).replace('\n', '<br/>');
 
 					var html = '<div class="ui-fontpicker-preview-text">' + text + '</div>',
 							prev = '<div class="ui-fontpicker-preview">' + html + '</div>',
@@ -546,7 +558,7 @@
 			footer: function (inst) {
 				var that = this,
 						e = null,
-						id_none = 'ui-fontpicker-special-none-' + _fontpicker_index,
+						id_none = 'ui-fontpicker-special-none-' + inst.fontpicker_index,
 						_html;
 
 				_html = function () {
@@ -594,44 +606,52 @@
 		};
 
 		this.Font = function (style) {
+			var objectToStyle = function (object) {
+				var css = [
+						'text-decoration',
+						'font-weight',
+						'font-style',
+						'font-variant',
+						'letter-spacing',
+						'line-height',
+						'font-family',
+						'font-size',
+						'color'
+					],
+					styles = [];
+
+				$.each(css, function (index, name) {
+					styles.push(name + ':' + object.css(name));
+				});
+
+				return styles.join(';');
+			};
+
+			this.set = false;
+
+			this.css = {};
+
 			this.toCSS = function () {
-				var css = '';
+				var styles = [],
+					parts;
+
 				$.each(this.css, function (tag, value) {
 					if (value !== null) {
 						if ($.isArray(value)) {
-							var parts = [];
+							parts = [];
 							$.each(value, function (index, part) {
 								parts.push(/^\S+$/.test(part) ? part : '"' + part + '"');
 							});
 							if (parts.length > 0) {
-								css += tag + ':' + parts.join(',') + ';';
+								styles.push(tag + ':' + parts.join(','));
 							}
 						} else {
-							css += tag + ':' + value + ';';
+							styles.push(tag + ':' + value);
 						}
 					}
 				});
-				return css;
-			};
 
-			var objectToStyle = function (object) {
-				var css = ['text-decoration'
-							, 'font-weight'
-							, 'font-style'
-							, 'font-variant'
-							, 'letter-spacing'
-							, 'line-height'
-							, 'font-family'
-							, 'font-size'
-							, 'color'
-				],
-						style = '';
-
-				$.each(css, function (index, name) {
-					style += name + ':' + object.css(name) + ';';
-				});
-
-				return style;
+				return styles.join(';');
 			};
 
 			this.copy = function () {
@@ -640,63 +660,61 @@
 				return font;
 			};
 
-			this.set = false;
+			this.setCss = function (style) {
+				var font = this,
+					wrapper = $('<div>').appendTo('body'),
+					item = $('<div style="' + style + '"/>').appendTo(wrapper),
+					actual;
 
-			this.css = {};
+				// Compare-to-normal, unchanged
+				$.each({
+					'text-decoration': 'none',
+					'font-weight': 'normal',
+					'font-style': 'normal',
+					'font-variant': 'normal',
+					'letter-spacing': 'normal'
+				}, function (tag, value) {
+					wrapper.css(tag, value);
+					actual = item.css(tag);
+					if (actual !== value) {
+						font.css[tag] = actual;
+					}
+				});
 
-			var font = this;
+				// Compare-to-normal, percentage-to-fontsize
+				$.each({
+					'line-height': 'normal'
+				}, function (tag, value) {
+					wrapper.css(tag, value);
+					actual = item.css(tag);
+					if (actual !== value) {
+						font.css[tag] = parseInt(parseInt(actual) * 100 / parseInt(item.css('font-size'))) + '%';
+					}
+				});
 
+				// Detect non-change
+				$.each({
+					'font-family': ['sans-serif', 'serif'],
+					'font-size': ['10px', '20px'],
+					'color': ['black', 'white']
+				}, function (tag, values) {
+					wrapper.css(tag, values[0]);
+					actual = item.css(tag);
+					wrapper.css(tag, values[1]);
+					if (actual === item.css(tag)) {
+						font.css[tag] = actual;
+					}
+				});
+
+				wrapper.remove();
+			};
+
+			// Construct
 			if (typeof style === 'object' && style.jquery) {
 				style = objectToStyle(style);
 			}
-
-			//@todo this.font = _parseFont(text); //@todo parseFont from text (css-like?) return Font object
-			var shell = $('<div>').appendTo('body');
-			var item = $('<div style="' + style + '"/>').appendTo(shell);
-
-			var results = {};
-
-			// Compare-to-normal, unchanged
-			$.each({
-				'text-decoration': 'none'
-				, 'font-weight': 'normal'
-				, 'font-style': 'normal'
-				, 'font-variant': 'normal'
-				, 'letter-spacing': 'normal'
-			}, function (tag, value) {
-				shell.css(tag, value);
-				var actual = item.css(tag);
-				if (actual != value) {
-					font.css[tag] = actual;
-				}
-			});
-
-			// Compare-to-normal, percentage-to-fontsize
-			$.each({
-				'line-height': 'normal'
-			}, function (tag, value) {
-				shell.css(tag, value);
-				var actual = item.css(tag);
-				if (actual != value) {
-					font.css[tag] = parseInt(parseInt(actual) * 100 / parseInt(item.css('font-size'))) + '%';
-				}
-			});
-
-			// Detect non-change
-			$.each({
-				'font-family': ['sans-serif', 'serif']
-				, 'font-size': ['10px', '20px']
-				, 'color': ['black', 'white']
-			}, function (tag, values) {
-				shell.css(tag, values[0]);
-				var actual = item.css(tag);
-				shell.css(tag, values[1]);
-				if (actual == item.css(tag)) {
-					font.css[tag] = actual;
-				}
-			});
-
-			shell.remove();
+			
+			this.setCss(style);
 		};
 	};
 
@@ -711,7 +729,7 @@
 			closeOnEscape: true, // Close the dialog when the escape key is pressed.
 			closeOnOutside: true, // Close the dialog when clicking outside the dialog (not for inline)
 			duration: 'fast',
-			regional: '',
+			inlineFrame: true,		// Show a border and background when inline.
 			layout: {
 				family: [0, 0, 1, 1], // Left, Top, Width, Height (in table cells).
 				style: [1, 0, 1, 1],
@@ -721,71 +739,75 @@
 			},
 			modal: false, // Modal dialog?
 			parts: '', // leave empty for automatic selection
+			regional: '',
 			showAnim: 'fadeIn',
 			showNoneButton: false,
 			showOn: 'focus', // 'focus', 'button', 'both'
 			showOptions: {},
 			title: null,
-			previewText: null,
-			families: [{name: 'Arial',
+			preview: null,
+			families: [
+				{	name: 'Arial',
 					faces: ['Arial', 'Helvetica', 'sans-serif']
 				},
-				{name: 'Arial Black',
+				{	name: 'Arial Black',
 					faces: ['Arial Black', 'Gadget', 'sans-serif']
 				},
-				{name: 'Comic Sans MS',
+				{	name: 'Comic Sans MS',
 					faces: ['Comic Sans MS', 'cursive', 'sans-serif']
 				},
-				{name: 'Courier New',
+				{	name: 'Courier New',
 					faces: ['Courier New', 'Courier', 'monospace']
 				},
-				{name: 'Georgia',
+				{	name: 'Georgia',
 					faces: ['Georgia', 'serif']
 				},
-				{name: 'Impact',
+				{	name: 'Impact',
 					faces: ['Impact', 'Charcoal', 'sans-serif']
 				},
-				{name: 'Lucida Console',
+				{	name: 'Lucida Console',
 					faces: ['Lucida Console', 'Monaco', 'monospace']
 				},
-				{name: 'Lucida Sans Unicode',
+				{	name: 'Lucida Sans Unicode',
 					faces: ['Lucida Sans Unicode', 'Lucida Grande', 'sans-serif']
 				},
-				{name: 'Palatino Linotype',
+				{	name: 'Palatino Linotype',
 					faces: ['Palatino Linotype', 'Book Antiqua', 'Palatino', 'serif']
 				},
-				{name: 'Tahoma',
+				{	name: 'Tahoma',
 					faces: ['Tahoma', 'Geneva', 'sans-serif']
 				},
-				{name: 'Times New Roman',
+				{	name: 'Times New Roman',
 					faces: ['Times New Roman', 'Times', 'serif']
 				},
-				{name: 'Trebuchet MS',
+				{	name: 'Trebuchet MS',
 					faces: ['Trebuchet MS', 'Helvetica', 'sans-serif']
 				},
-				{name: 'Verdana',
+				{	name: 'Verdana',
 					faces: ['Verdana', 'Geneva', 'sans-serif']
 				}
 			],
-			styles: [{name: 'Normal',
+			styles: [
+				{	name: 'Normal',
 					weight: 'normal',
 					style: 'normal'
 				},
-				{name: 'Bold',
+				{	name: 'Bold',
 					weight: 'bold',
 					style: 'normal'
 				},
-				{name: 'Italic',
+				{	name: 'Italic',
 					weight: 'normal',
 					style: 'italic'
 				},
-				{name: 'Bold italic',
+				{	name: 'Bold italic',
 					weight: 'bold',
 					style: 'italic'
 				}
 			],
 			sizes: [6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72],
-			settings: {'Character': [
+			settings: {
+				'Character': [
 					'letter-spacing',
 					'small-caps',
 					'underline',
@@ -805,7 +827,7 @@
 		_create: function () {
 			var that = this;
 
-			++_fontpicker_index;
+			that.fontpicker_index = _fontpicker_index++;
 
 			that.widgetEventPrefix = 'fontpicker';
 
@@ -813,13 +835,14 @@
 			that.generated = false;
 			that.inline = false;	//@todo use that.source = null
 			that.changed = false;
-			that.source = false;	// value/text/false
-
+			
 			that.dialog = null;
 			that.button = null;
 			that.image = null;
 			that.overlay = null;
 
+			that.source = false;	// value/css/false
+			
 			if (that.element[0].nodeName.toLowerCase() === 'input') {
 				that.source = 'val';
 			} else if (that.element.text()) {
@@ -958,8 +981,8 @@
 
 		_setFont: function (style) {
 			var that = this,
-					found = false,
-					faces;
+				found = false,
+				faces;
 
 			that.font = new $.fontpicker.Font(style);
 
@@ -982,39 +1005,104 @@
 
 		setFont: function (text) {
 			this._setFont(text);
-			this._change(this.font.set);
+			this._change(this.font.set);	//@todo boolean???
 		},
-
-		_effectGeneric: function (show, slide, fade, callback) {
+		
+		//@todo getFont
+		
+		//@todo _generateInline 
+		_generateInline: function() {
 			var that = this;
 
-			if ($.effects && $.effects[that.options.showAnim]) {
-				that.dialog[show](that.options.showAnim, that.options.showOptions, that.options.duration, callback);
-			} else {
-				that.dialog[(that.options.showAnim === 'slideDown' ?
-						slide
-						: (that.options.showAnim === 'fadeIn' ?
-								fade
-								: show))]((that.options.showAnim ? that.options.duration : null), callback);
-				if (!that.options.showAnim || !that.options.duration) {
-					callback();
-				}
-			}
+			$(that.element).html(that.options.inlineFrame ? _container_inlineFrame : _container_inline);
+
+			that.dialog = $('.ui-fontpicker', that.element);
 		},
 
-		_effectShow: function (callback) {
-			this._effectGeneric('show', 'slideDown', 'fadeIn', callback);
-		},
-
-		_effectHide: function (callback) {
-			this._effectGeneric('hide', 'slideUp', 'fadeOut', callback);
-		},
+		//@todo _generatePopup 
+		_generatePopup: function() {
+//			var that = this;
+//
+//			that.dialog = $(_container_popup).appendTo('body');
+//
+//			// Close on clicking outside window and controls
+//			if (that.events.document_click_html === null) {
+//				$(document).delegate('html', 'touchstart click', that.events.document_click_html = function (event) {
+//					if (!that.opened || event.target === that.element[0] || that.overlay) {
+//						return;
+//					}
+//
+//					// Check if clicked on any part of dialog
+//					if (that.dialog.is(event.target) || that.dialog.has(event.target).length > 0) {
+//						that.element.blur();	// inside window!
+//						return;
+//					}
+//
+//					// Check if clicked on known external elements
+//					var p,
+//						parents = $(event.target).parents();
+//					// add the event.target in case of buttonImageOnly and closeOnOutside both are set to true
+//					parents.push(event.target);
+//					for (p = 0; p <= parents.length; ++p) {
+//						// button
+//						if (that.button !== null && parents[p] === that.button[0]) {
+//							return;
+//						}
+//						// showOn alt
+//						if (/\balt|all|both\b/.test(that.options.showOn) && $(that.options.altField).is(parents[p])) {
+//							return;
+//						}
+//					}
+//
+//					// no closeOnOutside
+//					if (!that.options.closeOnOutside) {
+//						return;
+//					}
+//
+//					that.close(that.options.revert);
+//				});
+//			}
+//
+//			if (that.events.document_keydown === null) {
+//				$(document).bind('keydown', that.events.document_keydown = function (event) {
+//					// close on ESC key
+//					if (that.opened && event.keyCode === 27 && that.options.closeOnEscape) {
+//						that.close(that.options.revert);
+//					}
+//
+//					// OK on Enter key
+//					if (that.opened && event.keyCode === 13 && that.options.okOnEnter) {
+//						that.close();
+//					}
+//				});
+//			}
+//
+//			// Close (with OK) on tab key in element
+//			that.element.keydown(function (event) {
+//				if (event.keyCode === 9) {
+//					that.close();
+//				}
+//			}).keyup(function (event) {
+//				var color = that._parseColor(that.element.val());
+//				if (color && !that.color.equals(color)) {
+//					that.color = color;
+//					that._change();
+//				}
+//			});
+		},		
 
 		_generate: function () {
 			var that = this,
-					index,
-					part,
-					parts_list;
+				index,
+				part,
+				parts_list,
+				layout_parts,
+				table,
+				classes;
+
+			//@todo that._setFont(that.inline || !that.element.is('input') ? that.options.css : that.element.val());
+
+			//@todo that[that.inline ? '_generateInline' : '_generatePopup']();
 
 			// Determine the parts to include in this fontpicker
 			if (typeof that.options.parts === 'string') {
@@ -1037,7 +1125,7 @@
 			});
 
 			if (!that.generated) {
-				var layout_parts = [];
+				layout_parts = [];
 
 				$.each(that.options.layout, function (part, pos) {
 					if (that.parts[part]) {
@@ -1048,8 +1136,8 @@
 					}
 				});
 
-				$(_layoutTable(layout_parts, function (cell, x, y) {
-					var classes = ['ui-fontpicker-' + cell.part + '-container'];
+				table = $(_layoutTable(layout_parts, function (cell, x, y) {
+					classes = ['ui-fontpicker-' + cell.part + '-container'];
 
 					if (x > 0) {
 						classes.push('ui-fontpicker-padding-left');
@@ -1063,23 +1151,48 @@
 							+ (cell.pos[2] > 1 ? ' colspan="' + cell.pos[2] + '"' : '')
 							+ (cell.pos[3] > 1 ? ' rowspan="' + cell.pos[3] + '"' : '')
 							+ ' valign="top"></td>';
-				})).appendTo(that.dialog).addClass('ui-dialog-content ui-widget-content');
+				})).appendTo(that.dialog);
+				if (that.options.inlineFrame) {
+					table.addClass('ui-dialog-content ui-widget-content');
+				}
 
 				that._initAllParts();
 				that._updateAllParts();
 				that.generated = true;
 			}
 		},
+		
+		_effectGeneric: function (element, show, slide, fade, callback) {
+			var that = this;
+
+			if ($.effects && $.effects[that.options.showAnim]) {
+				element[show](that.options.showAnim, that.options.showOptions, that.options.duration, callback);
+			} else {				
+				element[(that.options.showAnim === 'slideDown' ?
+								slide
+							:	(that.options.showAnim === 'fadeIn' ?
+									fade
+								:	show))]((that.options.showAnim ? that.options.duration : null), callback);
+				if (!that.options.showAnim || !that.options.duration) {
+					callback();
+				}
+			}
+		},
+
+		_effectShow: function(element, callback) {
+			this._effectGeneric(element, 'show', 'slideDown', 'fadeIn', callback);
+		},
+
+		_effectHide: function(element, callback) {
+			this._effectGeneric(element, 'hide', 'slideUp', 'fadeOut', callback);
+		},
 
 		open: function () {
 			var that = this,
 					offset,
-					bottom,
-					right,
-					height,
-					width,
-					x,
-					y,
+					bottom, right,
+					height,	width,
+					x, y,
 					zIndex,
 					source = '';
 
@@ -1140,8 +1253,10 @@
 
 				that.overlay = that.options.modal ? new $.ui.dialog.overlay(that) : null;
 
-				that._effectShow();
+				that._effectShow(that.dialog);
+				
 				that.opened = true;
+				that._callback('open', true);
 
 				// Without waiting for domready the width of the map is 0 and we
 				// wind up with the cursor stuck in the upper left corner
@@ -1159,7 +1274,7 @@
 				that.changed = false;		//@todo on open instead?
 
 				// tear down the interface
-				that._effectHide(function () {
+				that._effectHide(that.dialog, function () {
 					that.dialog.empty();
 					that.generated = false;
 
@@ -1174,6 +1289,19 @@
 		},
 
 		destroy: function () {
+			var that = this;
+			if (that.events.document_click_html !== null) {
+				$(document).undelegate('html', 'touchstart click', that.events.document_click_html);
+			}
+			
+			if (that.events.document_keydown !== null) {
+				$(document).unbind('keydown', that.events.document_keydown);
+			}
+			
+			if (that.events.resizeOverlay !== null) {
+				$(window).unbind('resize', that.events.resizeOverlay);					
+			}
+			
 			this.element.unbind();
 
 			if (this.image !== null) {
@@ -1283,4 +1411,6 @@
 					$.fontpicker.regional[this.options.regional][name] : $.fontpicker.regional[''][name];
 		}
 	});
-}(jQuery));
+
+	return $.vanderlee.fontpicker;
+}));

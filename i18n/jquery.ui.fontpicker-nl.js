@@ -8,6 +8,6 @@ jQuery(function($) {
 		family:			'Lettertype:',
 		style:			'Tekenstijl:',
 		size:			'Punten:',
-		previewText:	'Pa\'s wijze lynx bezag\nvroom het fikse aquaduct.'
+		preview:		'Pa\'s wijze lynx bezag\nvroom het fikse aquaduct.'
 	};
 });
