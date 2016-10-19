@@ -50,7 +50,7 @@
 		},
 		
 		_settings = {
-			'line-height': function (fp) {
+			'line-height': function (inst) {
 				var that = this,
 						id = 'ui-fontpicker-settings-lineheight';
 
@@ -59,21 +59,22 @@
 				}
 
 				this.paintTo = function (container) {
-					$('<input id="' + id + '" step="5" min="0" max="9999" type="number" value="' + (fp.font.css['line-height'] ? parseInt(fp.font.css['line-height']) : '') + '"/>')
+					$('<input id="' + id + '" step="5" min="0" max="9999" type="number" value="' + (inst.font.css['line-height'] ? parseInt(inst.font.css['line-height']) : '') + '"/>')
 							.appendTo(container)
 							.change(function () {
 								var value = $(this).val();
-								fp.font.css['line-height'] = value ? value + '%' : null;
-								fp._change();
-							}).after('%');
+								inst.font.css['line-height'] = value ? value + '%' : null;
+								inst.font.set = true;								
+								inst._change();
+							}).after(inst._getRegional('unit-percentage'));
 				};
 
 				this.label = function () {
-					return fp._getRegional('line-height');
+					return inst._getRegional('setting-line-height');
 				};
 			},
 
-			'small-caps': function (fp) {
+			'small-caps': function (inst) {
 				var that = this,
 						id = 'ui-fontpicker-settings-smallcaps';
 
@@ -83,20 +84,21 @@
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(fp.font.css['font-variant'], 'small-caps'))
+							.attr('checked', _hasWord(inst.font.css['font-variant'], 'small-caps'))
 							.appendTo(container)
 							.change(function () {
-								fp.font.css['font-variant'] = $(this).is(':checked') ? 'small-caps' : null;
-								fp._change();
+								inst.font.css['font-variant'] = $(this).is(':checked') ? 'small-caps' : null;
+								inst.font.set = true;								
+								inst._change();
 							});
 				};
 
 				this.label = function () {
-					return fp._getRegional('small-caps');
+					return inst._getRegional('setting-small-caps');
 				};
 			},
 
-			'underline': function (fp) {
+			'underline': function (inst) {
 				var that = this,
 						id = 'ui-fontpicker-settings-underline';
 
@@ -106,20 +108,21 @@
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(fp.font.css['text-decoration'], 'underline'))
+							.attr('checked', _hasWord(inst.font.css['text-decoration'], 'underline'))
 							.appendTo(container)
 							.change(function () {
-								fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'underline', $(this).is(':checked'));
-								fp._change();
+								inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'underline', $(this).is(':checked'));
+								inst.font.set = true;								
+								inst._change();
 							});
 				};
 
 				this.label = function () {
-					return fp._getRegional('underline');
+					return inst._getRegional('setting-underline');
 				};
 			},
 
-			'overline': function (fp) {
+			'overline': function (inst) {
 				var that = this,
 						id = 'ui-fontpicker-settings-overline';
 
@@ -129,20 +132,21 @@
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(fp.font.css['text-decoration'], 'overline'))
+							.attr('checked', _hasWord(inst.font.css['text-decoration'], 'overline'))
 							.appendTo(container)
 							.change(function () {
-								fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'overline', $(this).is(':checked'));
-								fp._change();
+								inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'overline', $(this).is(':checked'));
+								inst.font.set = true;								
+								inst._change();
 							});
 				};
 
 				this.label = function () {
-					return fp._getRegional('overline');
+					return inst._getRegional('setting-overline');
 				};
 			},
 
-			'line-through': function (fp) {
+			'line-through': function (inst) {
 				var that = this,
 						id = 'ui-fontpicker-settings-linethrough';
 
@@ -152,20 +156,21 @@
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(fp.font.css['text-decoration'], 'line-through'))
+							.attr('checked', _hasWord(inst.font.css['text-decoration'], 'line-through'))
 							.appendTo(container)
 							.change(function () {
-								fp.font.css['text-decoration'] = _setWord(fp.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
-								fp._change();
+								inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
+								inst.font.set = true;								
+								inst._change();
 							});
 				};
 
 				this.label = function () {
-					return fp._getRegional('line-through');
+					return inst._getRegional('setting-line-through');
 				};
 			},
 
-			'letter-spacing': function (fp) {
+			'letter-spacing': function (inst) {
 				var that = this,
 						id = 'ui-fontpicker-settings-letterspacing',
 						input = null;
@@ -175,17 +180,18 @@
 				}
 
 				this.paintTo = function (container) {
-					$('<input id="' + id + '" min="-999" max="999" type="number" value="' + (fp.font.css['letter-spacing'] ? parseInt(fp.font.css['letter-spacing']) : '') + '"/>')
+					$('<input id="' + id + '" min="-999" max="999" type="number" value="' + (inst.font.css['letter-spacing'] ? parseInt(inst.font.css['letter-spacing']) : '') + '"/>')
 							.appendTo(container)
 							.change(function () {
 								var value = $(this).val();
-								fp.font.css['letter-spacing'] = value && value != 0 ? value + 'px' : null;
-								fp._change();
-							}).after('px');
+								inst.font.css['letter-spacing'] = value && value != 0 ? value + 'px' : null;
+								inst.font.set = true;								
+								inst._change();
+							}).after(inst._getRegional('unit-pixel'));
 				};
 
 				this.label = function () {
-					return fp._getRegional('letter-spacing');
+					return inst._getRegional('setting-letter-spacing');
 				};
 			}
 		},
@@ -292,14 +298,62 @@
 				'family': 'Family:',
 				'style': 'Style:',
 				'size': 'Size:',
-				'line-height': 'Line height',
-				'letter-spacing': 'Letter spacing',
-				'small-caps': 'Small caps',
-				'underline': 'Underline',
-				'overline': 'Overline',
-				'line-through': 'Strike through',
+				'unit-pixel': 'px',				
+				'unit-percentage': '%',
+				'settings-character': 'Character',
+				'settings-paragraph': 'Paragraph',				
+				'setting-line-height': 'Line height',
+				'setting-letter-spacing': 'Letter spacing',
+				'setting-small-caps': 'Small caps',
+				'setting-underline': 'Underline',
+				'setting-overline': 'Overline',
+				'setting-line-through': 'Strike through',
 				'preview': 'The quick brown fox jumps\nover the lazy dog.'
 			}
+		};
+
+		this.families = {
+			'default': [
+				{	name: 'Arial',
+					faces: ['Arial', 'Helvetica', 'sans-serif']
+				},
+				{	name: 'Arial Black',
+					faces: ['Arial Black', 'Gadget', 'sans-serif']
+				},
+				{	name: 'Comic Sans MS',
+					faces: ['Comic Sans MS', 'cursive', 'sans-serif']
+				},
+				{	name: 'Courier New',
+					faces: ['Courier New', 'Courier', 'monospace']
+				},
+				{	name: 'Georgia',
+					faces: ['Georgia', 'serif']
+				},
+				{	name: 'Impact',
+					faces: ['Impact', 'Charcoal', 'sans-serif']
+				},
+				{	name: 'Lucida Console',
+					faces: ['Lucida Console', 'Monaco', 'monospace']
+				},
+				{	name: 'Lucida Sans Unicode',
+					faces: ['Lucida Sans Unicode', 'Lucida Grande', 'sans-serif']
+				},
+				{	name: 'Palatino Linotype',
+					faces: ['Palatino Linotype', 'Book Antiqua', 'Palatino', 'serif']
+				},
+				{	name: 'Tahoma',
+					faces: ['Tahoma', 'Geneva', 'sans-serif']
+				},
+				{	name: 'Times New Roman',
+					faces: ['Times New Roman', 'Times', 'serif']
+				},
+				{	name: 'Trebuchet MS',
+					faces: ['Trebuchet MS', 'Helvetica', 'sans-serif']
+				},
+				{	name: 'Verdana',
+					faces: ['Verdana', 'Geneva', 'sans-serif']
+				}
+			]
 		};
 
 		this.partslists = {
@@ -307,74 +361,93 @@
 			'popup': ['family', 'style', 'size', 'settings', 'preview', 'footer'],
 			'inline': ['family', 'style', 'size', 'settings', 'preview']
 		};
-
+		
 		this.parts = {
 			header: function (inst) {
 				var that = this,
-						e = null,
-						_html = function () {
-							var title = inst.options.title ? inst.options.title : inst._getRegional('title');
+					part = null,
+					_html = function () {
+						var title = inst.options.title || inst._getRegional('title'),
+							html = '<span class="ui-dialog-title">' + title + '</span>';
+						
+						if (!inst.inline && inst.options.showCloseButton) {
+							html += '<a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button">'
+								+ '<span class="ui-icon ui-icon-closethick">close</span></a>';
+						}
 
-							return '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">'
-									+ '<span class="ui-dialog-title">' + title + '</span>'
-									+ '<a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button">'
-									+ '<span class="ui-icon ui-icon-closethick">close</span></a></div>';
-						};
+						return '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">' + html + '</div>';
+					},
+					_onclick = function(event) {
+						event.preventDefault();
+						inst.close(inst.options.revert);
+					};
 
 				this.init = function () {
-					e = $(_html()).prependTo(inst.dialog);
-					var close = $('.ui-dialog-titlebar-close', e);
+					part = $(_html()).prependTo(inst.dialog);
+					
+					var close = $('.ui-dialog-titlebar-close', part);
 					inst._hoverable(close);
 					inst._focusable(close);
+					close.bind('click', _onclick);
 
-					close.click(function () {
-						event.preventDefault();
-						inst.close();
-					});
+					if (!inst.inline && inst.options.draggable) {
+						var draggableOptions = {
+							handle: part,
+						}
+						if (inst.options.containment) {
+							draggableOptions.containment = inst.options.containment;
+						}
+						inst.dialog.draggable(draggableOptions);
+					}
 				};
+				
+				this.disable = function (disable) {
+					$('.ui-dialog-titlebar-close', part)[disable ? 'unbind' : 'bind']('click', _onclick);
+				};				
 			},
 
 			family: function (inst) {
 				var that = this,
-						e = null,
-						_families = function () {
-							var families = inst.options.families.slice();
-							if (inst.options.nullable) {
-								families.unshift({
-									name: '',
-									faces: null
-								});
+					part = null,
+					_families = function () {
+						var families = inst.options.families.slice();
+						if (inst.options.nullable) {
+							families.unshift({
+								name: '',
+								faces: null
+							});
+						}
+						return families;
+					},
+					_html = function () {
+						var html = '<div>' + inst._getRegional('family') + '</div>';
+						html += '<div style="padding-right:4px;"><input class="ui-fontpicker-family-text" type="text"/></div>';
+						html += '<div><select class="ui-fontpicker-family-select" size="8">';
+						$.each(_families(), function (index, family) {
+							html += '<option value="' + family.name + '">' + family.name + '</option>';
+						});
+						html += '</select></div>';
+						return '<div class="ui-fontpicker-family">' + html + '</div>';
+					},
+					_set = function (name) {
+						$.each(_families(), function (index, family) {
+							if (family.name.toLowerCase() == name.toLowerCase()) {
+								inst.font.css['font-family'] = family.faces;
+								inst.font.set = true;
+								inst._change();
+								return false;	// break
 							}
-							return families;
-						},
-						_html = function () {
-							var html = '<div>' + inst._getRegional('family') + '</div>';
-							html += '<div style="padding-right:4px;"><input class="ui-fontpicker-family-text" type="text"/></div>';
-							html += '<div><select class="ui-fontpicker-family-select" size="8">';
-							$.each(_families(), function (index, family) {
-								html += '<option value="' + family.name + '">' + family.name + '</option>';
-							});
-							html += '</select></div>';
-							return '<div class="ui-fontpicker-family">' + html + '</div>';
-						},
-						_set = function (name) {
-							$.each(_families(), function (index, family) {
-								if (family.name.toLowerCase() == name.toLowerCase()) {
-									inst.font.css['font-family'] = family.faces;
-									inst._change();
-									return false;	// break
-								}
-							});
-						};
+						});
+					};
 
 				this.init = function () {
-					e = $(_html()).appendTo($('.ui-fontpicker-family-container', inst.dialog));
+					part = $(_html()).appendTo($('.ui-fontpicker-family-container', inst.dialog));
 
-					$('.ui-fontpicker-family-text', e).on('change keyup', function () {
+					$('.ui-fontpicker-family-text', part).on('change keyup', function () {
 						_set($(this).val());
 					});
 
-					$('.ui-fontpicker-family-select', e).change(function () {
+					$('.ui-fontpicker-family-select', part).change(function () {
 						_set($(this).val());
 					});
 				};
@@ -383,7 +456,7 @@
 					var face = inst.font.css['font-family'] ? inst.font.css['font-family'][0] : '';
 					$.each(_families(), function (index, family) {
 						if (family.faces == inst.font.css['font-family']) {
-							$('.ui-fontpicker-family-text,.ui-fontpicker-family-select', e).not(':focus').val(face);
+							$('.ui-fontpicker-family-text,.ui-fontpicker-family-select', part).not(':focus').val(face);
 							return false;	// break
 						}
 					});
@@ -392,36 +465,37 @@
 
 			style: function (inst) {
 				var that = this,
-						e = null,
-						_html = function () {
-							var html = '<div>' + inst._getRegional('style') + '</div>';
-							html += '<div style="padding-right:4px;"><input class="ui-fontpicker-style-text" type="text"/></div>';
-							html += '<div><select class="ui-fontpicker-style-select" size="8">';
-							$.each(inst.options.styles, function (index, style) {
-								html += '<option value="' + style.name + '">' + style.name + '</option>';
-							});
-							html += '</select></div>';
-							return '<div class="ui-fontpicker-style">' + html + '</div>';
-						},
-						_set = function (name) {
-							$.each(inst.options.styles, function (index, style) {
-								if (style.name.toLowerCase() == name.toLowerCase()) {
-									inst.font.css['font-weight'] = style.weight == 'normal' ? null : style.weight;
-									inst.font.css['font-style'] = style.style == 'normal' ? null : style.style;
-									inst._change();
-									return false;	// break
-								}
-							});
-						};
+					part = null,
+					_html = function () {
+						var html = '<div>' + inst._getRegional('style') + '</div>';
+						html += '<div style="padding-right:4px;"><input class="ui-fontpicker-style-text" type="text"/></div>';
+						html += '<div><select class="ui-fontpicker-style-select" size="8">';
+						$.each(inst.options.styles, function (index, style) {
+							html += '<option value="' + style.name + '">' + style.name + '</option>';
+						});
+						html += '</select></div>';
+						return '<div class="ui-fontpicker-style">' + html + '</div>';
+					},
+					_set = function (name) {
+						$.each(inst.options.styles, function (index, style) {
+							if (style.name.toLowerCase() == name.toLowerCase()) {
+								inst.font.css['font-weight'] = style.weight == 'normal' ? null : style.weight;
+								inst.font.css['font-style'] = style.style == 'normal' ? null : style.style;
+								inst.font.set = true;								
+								inst._change();
+								return false;	// break
+							}
+						});
+					};
 
 				this.init = function () {
-					e = $(_html()).appendTo($('.ui-fontpicker-style-container', inst.dialog));
+					part = $(_html()).appendTo($('.ui-fontpicker-style-container', inst.dialog));
 
-					$('.ui-fontpicker-style-text', e).on('change keyup', function () {
+					$('.ui-fontpicker-style-text', part).on('change keyup', function () {
 						_set($(this).val());
 					});
 
-					$('.ui-fontpicker-style-select', e).change(function () {
+					$('.ui-fontpicker-style-select', part).change(function () {
 						_set($(this).val());
 					});
 				};
@@ -432,7 +506,7 @@
 					$.each(inst.options.styles, function (index, style) {
 						if (style.weight == bold
 								&& style.style == italic) {
-							$('.ui-fontpicker-style-text,.ui-fontpicker-style-select', e).not(':focus').val(style.name);
+							$('.ui-fontpicker-style-text,.ui-fontpicker-style-select', part).not(':focus').val(style.name);
 							return false;	// break
 						}
 					});
@@ -441,62 +515,63 @@
 
 			size: function (inst) {
 				var that = this,
-						e = null,
-						_sizes = function () {
-							var sizes = inst.options.sizes.slice();
-							if (inst.options.nullable) {
-								sizes.unshift('');
-							}
-							return sizes;
-						},
-						_html = function () {
-							var html = '<div>' + inst._getRegional('size') + '</div>';
-							html += '<div style="padding-right:4px;"><input class="ui-fontpicker-size-text" type="text"/></div>';
-							html += '<div><select class="ui-fontpicker-size-select" size="8">';
-							$.each(_sizes(), function (index, size) {
-								html += '<option value="' + size + '">' + size + '</option>';
-							});
-							html += '</select></div>';
-							return '<div class="ui-fontpicker-size">' + html + '</div>';
-						},
-						_set = function (size) {
-							inst.font.css['font-size'] = size ? Math.max(1, parseInt(size, 10)) + 'px' : null;
-							inst._change();
-						};
+					part = null,
+					_sizes = function () {
+						var sizes = inst.options.sizes.slice();
+						if (inst.options.nullable) {
+							sizes.unshift('');
+						}
+						return sizes;
+					},
+					_html = function () {
+						var html = '<div>' + inst._getRegional('size') + '</div>';
+						html += '<div style="padding-right:4px;"><input class="ui-fontpicker-size-text" type="text"/></div>';
+						html += '<div><select class="ui-fontpicker-size-select" size="8">';
+						$.each(_sizes(), function (index, size) {
+							html += '<option value="' + size + '">' + size + '</option>';
+						});
+						html += '</select></div>';
+						return '<div class="ui-fontpicker-size">' + html + '</div>';
+					},
+					_set = function (size) {
+						inst.font.css['font-size'] = size ? Math.max(1, parseInt(size, 10)) + 'px' : null;
+						inst.font.set = true;								
+						inst._change();
+					};
 
 				this.init = function () {
-					e = $(_html()).appendTo($('.ui-fontpicker-size-container', inst.dialog));
+					part = $(_html()).appendTo($('.ui-fontpicker-size-container', inst.dialog));
 
-					$('.ui-fontpicker-size-text', e).on('change keyup', function () {
+					$('.ui-fontpicker-size-text', part).on('change keyup', function () {
 						_set($(this).val());
 					});
 
-					$('.ui-fontpicker-size-select', e).change(function () {
+					$('.ui-fontpicker-size-select', part).change(function () {
 						_set($(this).val());
 					});
 				};
 
 				this.repaint = function () {
 					var size = inst.font.css['font-size'] ? parseInt(inst.font.css['font-size'], 10) : '';
-					$('.ui-fontpicker-size-text,.ui-fontpicker-size-select', e).not(':focus').val(size);
+					$('.ui-fontpicker-size-text,.ui-fontpicker-size-select', part).not(':focus').val(size);
 				};
 			},
 
 			settings: function (inst) {
 				var that = this,
-						e = null,
-						_html = function () {
-							return '<div class="ui-fontpicker-settings"><ul/></div>';
-						};
+					part = null,
+					_html = function () {
+						return '<div class="ui-fontpicker-settings"><ul/></div>';
+					};
 
 				this.init = function () {
-					e = $(_html()).appendTo($('.ui-fontpicker-settings-container', inst.dialog));
+					part = $(_html()).appendTo($('.ui-fontpicker-settings-container', inst.dialog));
 
 					inst.settings = {};
 					$.each(inst.options.settings, function (label, settings) {
 						var columns = 3,
 								id = 'ui-fontpicker-settings-' + label.toLowerCase() + '-' + inst.fontpicker_index,
-								page = $('<div id="' + id + '"></div>').appendTo(e),
+								page = $('<div id="' + id + '"></div>').appendTo(part),
 								chunk_size = Math.ceil(settings.length / columns),
 								chunks = [].concat.apply([],
 								//@todo Better chunking algorithm that prefers columns over chunk_size
@@ -523,85 +598,102 @@
 							}
 						}
 
-						$('ul', e).append('<li><a href="#' + id + '">' + label + '</a></li>');
+						$('ul', part).append('<li><a href="#' + id + '">' + inst._getRegional('settings-' + label) + '</a></li>');
 					});
 
-					e.tabs();
+					part.tabs();
 				};
 			},
 
 			preview: function (inst) {
 				var that = this,
-						e = null,
-						_html;
-
-				_html = function () {
-					var text = (inst.options.preview || inst._getRegional('preview')).replace('\n', '<br/>');
-
-					var html = '<div class="ui-fontpicker-preview-text">' + text + '</div>',
+					part = null,
+					_html = function () {
+						var text = (inst.options.preview || inst._getRegional('preview')).replace('\n', '<br/>'),
+							html = '<div class="ui-fontpicker-preview-text">' + text + '</div>',
 							prev = '<div class="ui-fontpicker-preview">' + html + '</div>',
 							inner = '<div class="ui-fontpicker-preview-inner">' + prev + '</div>',
 							outer = '<div class="ui-fontpicker-preview-outer">' + inner + '</div>';
 
-					return outer;
-				};
+						return outer;
+					};
 
 				this.init = function () {
-					e = $(_html()).appendTo($('.ui-fontpicker-preview-container', inst.dialog));
+					part = $(_html()).appendTo($('.ui-fontpicker-preview-container', inst.dialog));
 				};
 
 				this.repaint = function () {
-					$('.ui-fontpicker-preview-text', e).attr('style', inst.font.toCSS(true));
+					$('.ui-fontpicker-preview-text', part).attr('style', inst.font.toCSS(true));
 				};
 			},
 
 			footer: function (inst) {
 				var that = this,
-						e = null,
-						id_none = 'ui-fontpicker-special-none-' + inst.fontpicker_index,
-						_html;
-
-				_html = function () {
-					var html = '';
-
-					if (!inst.inline && inst.options.showNoneButton) {
-						html += '<div class="ui-fontpicker-buttonset">';
+					part = null,
+					id_none = 'ui-fontpicker-special-none-' + inst.fontpicker_index,
+					_html = function () {
+						var html = '';
 
 						if (!inst.inline && inst.options.showNoneButton) {
-							html += '<input type="radio" name="ui-fontpicker-special" id="' + id_none + '"><label for="' + id_none + '">' + inst._getRegional('none') + '</label>';
+							html += '<div class="ui-fontpicker-buttonset">';
+
+							if (!inst.inline && inst.options.showNoneButton) {
+								html += '<input type="radio" name="ui-fontpicker-special" id="' + id_none + ' class="ui-fontpicker-special-none"><label for="' + id_none + '">' + inst._getRegional('none') + '</label>';
+							}
+							html += '</div>';
 						}
-						html += '</div>';
-					}
 
-					if (!inst.inline) {
-						html += '<div class="ui-dialog-buttonset">';
-						html += '<button class="ui-fontpicker-cancel">' + inst._getRegional('cancel') + '</button>';
-						html += '<button class="ui-fontpicker-ok">' + inst._getRegional('ok') + '</button>';
-						html += '</div>';
-					}
+						if (!inst.inline) {
+							html += '<div class="ui-dialog-buttonset">';
+							if (inst.options.showCancelButton) {
+								html += '<button class="ui-fontpicker-cancel">' + inst._getRegional('cancel') + '</button>';
+							}							
+							html += '<button class="ui-fontpicker-ok">' + inst._getRegional('ok') + '</button>';
+							html += '</div>';
+						}
 
-					return '<div class="ui-dialog-buttonpane ui-widget-content">' + html + '</div>';
-				};
+						return '<div class="ui-dialog-buttonpane ui-widget-content">' + html + '</div>';
+					};
 
 				this.init = function () {
-					e = $(_html()).appendTo(inst.dialog);
+					part = $(_html()).appendTo(inst.dialog);
 
-					$('.ui-fontpicker-ok', e).button().click(function () {
+					$('.ui-fontpicker-ok', part).button().click(function () {
 						inst.close();
 					});
 
-					$('.ui-fontpicker-cancel', e).button().click(function () {
+					$('.ui-fontpicker-cancel', part).button().click(function () {
 						inst.font = $.extend({}, inst.previousFont);
-						inst._change(inst.font.set);
+						inst._change();
 						inst.close();
 					});
 
-					$('.ui-fontpicker-buttonset', e)[$.fn.controlgroup ? 'controlgroup' : 'buttonset']();
+					$('.ui-fontpicker-buttonset', part)[$.fn.controlgroup ? 'controlgroup' : 'buttonset']();
 
-					$('#' + id_none, e).click(function () {
-						inst._change(false);
+					$('#' + id_none, part).click(function () {
+						inst.font.set = false;
+						inst._change();
 					});
 				};
+				
+				this.repaint = function () {
+					if (!inst.font.set) {
+						$('.ui-fontpicker-special-none', part).attr('checked', true).button('refresh');
+					} else {
+						$('input', part).attr('checked', false).button( "refresh" );
+					}
+
+					$('.ui-fontpicker-ok', part).button(inst.changed ? 'enable' : 'disable');
+				};
+
+				this.update = function () {};
+
+				this.disable = function (disabled) {
+					$(':input, :button', part).button(disabled ? 'disable' : 'enable');
+					if (!disabled) {
+						$('.ui-fontpicker-ok', part).button(inst.changed ? 'enable' : 'disable');
+					}
+				};				
 			}
 		};
 
@@ -630,6 +722,14 @@
 			this.set = false;
 
 			this.css = {};
+			
+			this.equals = function(font) {
+				if (font) {
+					return this.set === font.set
+						&& this.toCSS() === font.toCSS();
+				}
+				return false;
+			};
 
 			this.toCSS = function () {
 				var styles = [],
@@ -729,6 +829,7 @@
 			closeOnEscape: true, // Close the dialog when the escape key is pressed.
 			closeOnOutside: true, // Close the dialog when clicking outside the dialog (not for inline)
 			duration: 'fast',
+			families: $.fontpicker.families.default,
 			inlineFrame: true,		// Show a border and background when inline.
 			layout: {
 				family: [0, 0, 1, 1], // Left, Top, Width, Height (in table cells).
@@ -738,55 +839,27 @@
 				preview: [0, 2, 3, 1]
 			},
 			modal: false, // Modal dialog?
+			nullable:			true,			
 			parts: '', // leave empty for automatic selection
+			preview: null,
 			regional: '',
+			settings: {
+				'character': [
+					'letter-spacing',
+					'small-caps',
+					'underline',
+					'overline',
+					'line-through'
+				],
+				'paragraph': [
+					'line-height'
+				]
+			},
 			showAnim: 'fadeIn',
 			showNoneButton: false,
-			showOn: 'focus', // 'focus', 'button', 'both'
+			showOn:	'focus click alt',		// 'focus', 'click', 'button', 'alt', 'all'
 			showOptions: {},
-			title: null,
-			preview: null,
-			families: [
-				{	name: 'Arial',
-					faces: ['Arial', 'Helvetica', 'sans-serif']
-				},
-				{	name: 'Arial Black',
-					faces: ['Arial Black', 'Gadget', 'sans-serif']
-				},
-				{	name: 'Comic Sans MS',
-					faces: ['Comic Sans MS', 'cursive', 'sans-serif']
-				},
-				{	name: 'Courier New',
-					faces: ['Courier New', 'Courier', 'monospace']
-				},
-				{	name: 'Georgia',
-					faces: ['Georgia', 'serif']
-				},
-				{	name: 'Impact',
-					faces: ['Impact', 'Charcoal', 'sans-serif']
-				},
-				{	name: 'Lucida Console',
-					faces: ['Lucida Console', 'Monaco', 'monospace']
-				},
-				{	name: 'Lucida Sans Unicode',
-					faces: ['Lucida Sans Unicode', 'Lucida Grande', 'sans-serif']
-				},
-				{	name: 'Palatino Linotype',
-					faces: ['Palatino Linotype', 'Book Antiqua', 'Palatino', 'serif']
-				},
-				{	name: 'Tahoma',
-					faces: ['Tahoma', 'Geneva', 'sans-serif']
-				},
-				{	name: 'Times New Roman',
-					faces: ['Times New Roman', 'Times', 'serif']
-				},
-				{	name: 'Trebuchet MS',
-					faces: ['Trebuchet MS', 'Helvetica', 'sans-serif']
-				},
-				{	name: 'Verdana',
-					faces: ['Verdana', 'Geneva', 'sans-serif']
-				}
-			],
+			sizes: [6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72],
 			styles: [
 				{	name: 'Normal',
 					weight: 'normal',
@@ -805,23 +878,15 @@
 					style: 'italic'
 				}
 			],
-			sizes: [6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72],
-			settings: {
-				'Character': [
-					'letter-spacing',
-					'small-caps',
-					'underline',
-					'overline',
-					'line-through'
-				],
-				'Paragraph': [
-					'line-height'
-				]
-			},
-			nullable: true,
+			title: null,
 
-			close: null,
-			select: null
+			cancel:             null,
+            close:              null,
+			init:				null,
+            ok:                 null,
+			open:               null,
+			select:             null,
+			stop:				null
 		},
 
 		_create: function () {
@@ -840,98 +905,62 @@
 			that.button = null;
 			that.image = null;
 			that.overlay = null;
-
-			that.source = false;	// value/css/false
 			
-			if (that.element[0].nodeName.toLowerCase() === 'input') {
-				that.source = 'val';
-			} else if (that.element.text()) {
-				that.source = 'css';
-			} else {
-				that.inline = true;
-			}
+			that.events = {
+				window_resize:			null,
+				document_keydown:		null,
+				document_click_html:	null
+			};
 
-			if (that.inline) {
-				$(that.element).empty();
-				that.dialog = $(_container_inline).appendTo(that.element);
-
-				that.open();
-			} else {
-				that.dialog = $(_container_popup).appendTo('body');
-
-				// Close dialog on mouse button
-				$(document).mousedown(function (event) {
-					if (!that.opened || event.target === that.element[0]) {
-						return;
-					}
-
-					// Check if clicked on any part of dialog
-					if (that.dialog.is(event.target) || that.dialog.has(event.target).length > 0) {
-						that.element.blur();	// inside window!
-						return;
-					}
-
-					// Check if clicked on button
-					var p,
-							parents = $(event.target).parents();
-					for (p in parents) {
-						if (that.button !== null && parents[p] === that.button[0]) {
-							return;
-						}
-					}
-
-					// no closeOnOutside
-					if (!that.options.closeOnOutside) {
-						return;
-					}
-
-					that.close();
-				});
-
-				// Close dialog on escape key
-				$(document).keydown(function (event) {
-					if (event.keyCode == 27 && that.options.closeOnEscape) {
-						that.close();
-					}
-				});
-
-				// Close dialog on tab key (lose focus)
-				that.element.keydown(function (event) {
-					if (event.keyCode === 9) {
-						that.close();
-					}
-				}).keyup(function (event) {
-					//@todo Font parsing from text input
-//					var rgb = _parseHex(that.element.val());
-//					if (rgb) {
-//						that.color = (rgb === false ? new Font() : new Font(rgb[0], rgb[1], rgb[2]));
-//						that._change();
-//					}
-				});
-
-				// Open dialog on focus
-				if (that.options.showOn === 'focus' || that.options.showOn === 'both') {
-					// Open dialog on focus
-					that.element.focus(function () {
-						that.open();
-					});
-
-					// Open dialog on click
-					that.element.click(function () {
+			if (that.element.is('input') || that.element.text() || that.options.inline === false) {
+				// Initial font
+				if (that.element.is('input')) {
+					that.options.css = that.element.val();					
+				} else if (that.element.text()) {
+					that.options.css = that.element;										
+				}
+				that._setFont(that.options.css);
+				
+				that._callback('init');
+				
+				// showOn focus
+				if (/\bfocus|all|both\b/.test(that.options.showOn)) {
+					that.element.bind('focus', function () {
 						that.open();
 					});
 				}
+				if (/\bfocus|all|both\b/.test(that.options.hideOn)) {
+					that.element.bind('focusout', function (e) {
+						that.close();
+					});
+				}
 
-				// Open dialog on button
-				if (that.options.showOn === 'button' || that.options.showOn === 'both') {
+				// showOn click
+				if (/\bclick|all|both\b/.test(that.options.showOn)) {
+					that.element.bind('click', function (e) {	
+						if (that.opened && /\bclick|all|both\b/.test(that.options.hideOn)) {
+							that.close();
+						} else {
+							that.open();
+						}
+					});
+				}
+
+				// showOn button
+				if (/\bbutton|all|both\b/.test(that.options.showOn)) {
 					if (that.options.buttonImage !== '') {
-						var text = that.options.buttonText ? that.options.buttonText : that._getRegional('button');
+						text = that.options.buttonText || that._getRegional('button');
 
 						that.image = $('<img/>').attr({
-							'src': that.options.buttonImage,
-							'alt': text,
-							'title': text
+							'src':		that.options.buttonImage,
+							'alt':		text,
+							'title':	text
 						});
+						if (that.options.buttonClass) {
+							that.image.attr('class', that.options.buttonClass);
+						}
+
+						that._setImageBackground();
 					}
 
 					if (that.options.buttonImageOnly && that.image) {
@@ -941,15 +970,38 @@
 						that.image = that.image ? $('img', that.button).first() : null;
 					}
 					that.button.insertAfter(that.element).click(function () {
-						that[that.opened ? 'close' : 'open']();
+						if (that.opened && /\bbutton|all|both\b/.test(that.options.hideOn)) {
+							that.close();
+						} else {
+							that.open();
+						}
 					});
 				}
 
-				// Automatically open dialog
+				// showOn alt
+				if (/\balt|all|both\b/.test(that.options.showOn)) {					
+					$(that.options.altField).bind('click', function () {
+						if (that.opened && /\balt|all|both\b/.test(that.options.hideOn)) {
+							that.close();
+						} else {
+							that.open();
+						}
+					});
+				}
+
 				if (that.options.autoOpen) {
 					that.open();
 				}
-			}
+
+			} else {
+				that.inline = true;
+
+				that._generate();
+				that.opened = true;
+			}				
+
+			// Disable Widget-style
+			(that.element.is(':disabled') || that.options.disabled) && that.disable();
 
 			return this;
 		},
@@ -970,47 +1022,52 @@
 			$.Widget.prototype._setOption.apply(that, arguments);
 		},
 
-		/**
-		 * If an alternate field is specified, set it according to the current font.
-		 */
+		enable: function () {
+			//$.Widget.prototype.enable.call(this);
+			this.element && this.element.prop('disabled', false);
+			this.button && this.button.prop('disabled', false);
+			this.dialog && this.dialog.removeClass('ui-fontpicker-disabled');
+			this.options.disabled = false;
+
+			this.parts && $.each(this.parts, function (index, part) {
+				part.disable && part.disable(false);
+			});
+		},
+		
+		disable: function () {
+			//$.Widget.prototype.disable.call(this);
+			this.element && this.element.prop('disabled', true);
+			this.button && this.button.prop('disabled', true);
+			this.dialog && this.dialog.addClass('ui-fontpicker-disabled');
+			this.options.disabled = true;
+
+			this.parts && $.each(this.parts, function (index, part) {
+				part.disable && part.disable(true);
+			});
+		},
+
 		_setAltField: function () {
 			if (this.options.altOnChange && this.options.altField) {
 				$(this.options.altField).attr('style', this.font.set ? this.font.toCSS() : '');
 			}
 		},
 
-		_setFont: function (style) {
-			var that = this,
-				found = false,
-				faces;
-
-			that.font = new $.fontpicker.Font(style);
-
-			if (that.font.css['font-family']) {
-				faces = that.font.css['font-family'].split(/,/);
-
-				$.each(faces, function (index, face) {
-					face = $.trim(face.replace(/^(['"])(.*)\1$/, '$2'));
-					$.each(that.options.families, function (index, family) {
-						if (face == family.name) {
-							that.font.css['font-family'] = family.faces;
-							found = true;
-							return !found;
-						}
-					});
-					return !found;
-				});
-			}
+		_setFont: function(css) {
+			this.font			= this._parseFont(css) || new $.fontpickerFontColor();
+			this.currentColor	= this.font.copy();			
+			
+			this._setAltField();
 		},
 
-		setFont: function (text) {
-			this._setFont(text);
-			this._change(this.font.set);	//@todo boolean???
+		setFont: function(css) {
+			this._setFont(css);
+			this._change();
 		},
 		
-		//@todo getFont
+		getFont: function() {
+			return this.font.toCSS();
+		},
 		
-		//@todo _generateInline 
 		_generateInline: function() {
 			var that = this;
 
@@ -1019,76 +1076,75 @@
 			that.dialog = $('.ui-fontpicker', that.element);
 		},
 
-		//@todo _generatePopup 
 		_generatePopup: function() {
-//			var that = this;
-//
-//			that.dialog = $(_container_popup).appendTo('body');
-//
-//			// Close on clicking outside window and controls
-//			if (that.events.document_click_html === null) {
-//				$(document).delegate('html', 'touchstart click', that.events.document_click_html = function (event) {
-//					if (!that.opened || event.target === that.element[0] || that.overlay) {
-//						return;
-//					}
-//
-//					// Check if clicked on any part of dialog
-//					if (that.dialog.is(event.target) || that.dialog.has(event.target).length > 0) {
-//						that.element.blur();	// inside window!
-//						return;
-//					}
-//
-//					// Check if clicked on known external elements
-//					var p,
-//						parents = $(event.target).parents();
-//					// add the event.target in case of buttonImageOnly and closeOnOutside both are set to true
-//					parents.push(event.target);
-//					for (p = 0; p <= parents.length; ++p) {
-//						// button
-//						if (that.button !== null && parents[p] === that.button[0]) {
-//							return;
-//						}
-//						// showOn alt
-//						if (/\balt|all|both\b/.test(that.options.showOn) && $(that.options.altField).is(parents[p])) {
-//							return;
-//						}
-//					}
-//
-//					// no closeOnOutside
-//					if (!that.options.closeOnOutside) {
-//						return;
-//					}
-//
-//					that.close(that.options.revert);
-//				});
-//			}
-//
-//			if (that.events.document_keydown === null) {
-//				$(document).bind('keydown', that.events.document_keydown = function (event) {
-//					// close on ESC key
-//					if (that.opened && event.keyCode === 27 && that.options.closeOnEscape) {
-//						that.close(that.options.revert);
-//					}
-//
-//					// OK on Enter key
-//					if (that.opened && event.keyCode === 13 && that.options.okOnEnter) {
-//						that.close();
-//					}
-//				});
-//			}
-//
-//			// Close (with OK) on tab key in element
-//			that.element.keydown(function (event) {
-//				if (event.keyCode === 9) {
-//					that.close();
-//				}
-//			}).keyup(function (event) {
-//				var color = that._parseColor(that.element.val());
-//				if (color && !that.color.equals(color)) {
-//					that.color = color;
-//					that._change();
-//				}
-//			});
+			var that = this;
+
+			that.dialog = $(_container_popup).appendTo('body');
+
+			// Close on clicking outside window and controls
+			if (that.events.document_click_html === null) {
+				$(document).delegate('html', 'touchstart click', that.events.document_click_html = function (event) {
+					if (!that.opened || event.target === that.element[0] || that.overlay) {
+						return;
+					}
+
+					// Check if clicked on any part of dialog
+					if (that.dialog.is(event.target) || that.dialog.has(event.target).length > 0) {
+						that.element.blur();	// inside window!
+						return;
+					}
+
+					// Check if clicked on known external elements
+					var p,
+						parents = $(event.target).parents();
+					// add the event.target in case of buttonImageOnly and closeOnOutside both are set to true
+					parents.push(event.target);
+					for (p = 0; p <= parents.length; ++p) {
+						// button
+						if (that.button !== null && parents[p] === that.button[0]) {
+							return;
+						}
+						// showOn alt
+						if (/\balt|all|both\b/.test(that.options.showOn) && $(that.options.altField).is(parents[p])) {
+							return;
+						}
+					}
+
+					// no closeOnOutside
+					if (!that.options.closeOnOutside) {
+						return;
+					}
+
+					that.close(that.options.revert);
+				});
+			}
+
+			if (that.events.document_keydown === null) {
+				$(document).bind('keydown', that.events.document_keydown = function (event) {
+					// close on ESC key
+					if (that.opened && event.keyCode === 27 && that.options.closeOnEscape) {
+						that.close(that.options.revert);
+					}
+
+					// OK on Enter key
+					if (that.opened && event.keyCode === 13 && that.options.okOnEnter) {
+						that.close();
+					}
+				});
+			}
+
+			// Close (with OK) on tab key in element
+			that.element.keydown(function (event) {
+				if (event.keyCode === 9) {
+					that.close();
+				}
+			}).keyup(function (event) {
+				var font = that._parseFont(that.element.val());
+				if (font && !that.font.equals(font)) {
+					that.font = font;
+					that._change();
+				}
+			});
 		},		
 
 		_generate: function () {
@@ -1098,11 +1154,18 @@
 				parts_list,
 				layout_parts,
 				table,
-				classes;
+				classes,
+				css = that.options.css;
 
-			//@todo that._setFont(that.inline || !that.element.is('input') ? that.options.css : that.element.val());
+			// Initial font
+			if (that.element.is('input')) {
+				css = that.element.val();					
+			} else if (that.element.text()) {
+				css = that.element;										
+			}
+			that._setFont(css);
 
-			//@todo that[that.inline ? '_generateInline' : '_generatePopup']();
+			that[that.inline ? '_generateInline' : '_generatePopup']();
 
 			// Determine the parts to include in this fontpicker
 			if (typeof that.options.parts === 'string') {
@@ -1187,106 +1250,132 @@
 			this._effectGeneric(element, 'hide', 'slideUp', 'fadeOut', callback);
 		},
 
-		open: function () {
+		open: function() {
 			var that = this,
-					offset,
-					bottom, right,
-					height,	width,
-					x, y,
-					zIndex,
-					source = '';
+				offset,
+				bottom, right,
+				height, width,
+				x, y,
+				zIndex,
+				element,
+				position;
 
 			if (!that.opened) {
-				switch (that.source) {
-					case 'val':
-						source = that.element.val();
-						break;
-					case 'css':
-						source = that.element;
-						break;
-					default:
-						source = that.options.font;
-						break;
-				}
-				that._setFont(source);
-
-				that.previousFont = that.font.copy();
-
-				that._callback('init');
-
 				that._generate();
-
-				offset = that.element.offset();
-				bottom = $(window).height() + $(window).scrollTop();
-				right = $(window).width() + $(window).scrollLeft();
-				height = that.dialog.outerHeight();
-				width = that.dialog.outerWidth();
-				x = offset.left;
-				y = offset.top + that.element.outerHeight();
-
-				if (x + width > right) {
-					x = Math.max(0, right - width);
+				
+				if (that.element.is(':hidden')) {
+					element = $('<div/>').insertBefore(that.element);
+				} else {
+					element = that.element;
+				}			
+				
+				if (that.element.is(':hidden')) {
+					element.remove();
 				}
-
-				if (y + height > bottom) {
-					if (offset.top - height >= $(window).scrollTop()) {
-						y = offset.top - height;
-					} else {
-						y = Math.max(0, bottom - height);
-					}
-				}
-
-				that.dialog.css({'left': x, 'top': y});
-
+				
 				// Automatically find highest z-index.
 				zIndex = 0;
-				$(that.element[0]).parents().each(function () {
+				$(that.element[0]).parents().each(function() {
 					var z = $(this).css('z-index');
-					if ((typeof (z) === 'number' || typeof (z) === 'string') && z !== '' && !isNaN(z)) {
-						zIndex = z;
-						return false;
+					if ((typeof(z) === 'number' || typeof(z) === 'string') && z !== '' && !isNaN(z)) {
+						if (z > zIndex) {
+							zIndex = parseInt(z, 10);
+							return false;
+						}
+					}
+					else {
+						$(this).siblings().each(function() {
+							var z = $(this).css('z-index');
+							if ((typeof(z) === 'number' || typeof(z) === 'string') && z !== '' && !isNaN(z)) {
+								if (z > zIndex) {
+									zIndex = parseInt(z, 10);
+								}
+							}
+						});
 					}
 				});
 
-				//@todo zIndexOffset option, to raise above other elements?
-				that.dialog.css('z-index', zIndex += 2);
+				zIndex += 2;
+				that.dialog.css('z-index', zIndex);
+								
+				if (that.options.modal) {
+					that.overlay = $('<div class="ui-widget-overlay"></div>').appendTo('body').css('z-index', zIndex - 1);										
 
-				that.overlay = that.options.modal ? new $.ui.dialog.overlay(that) : null;
+					if (that.events.window_resize !== null) {
+						$(window).unbind('resize', that.events.window_resize);					
+					}
+					
+					that.events.window_resize = function() {
+						if (that.overlay) {
+							that.overlay.width($(document).width());
+							that.overlay.height($(document).height());					
+						}
+					},
+															
+					$(window).bind('resize', that.events.window_resize);
+					that.events.window_resize();			
+				}
 
-				that._effectShow(that.dialog);
+				that._effectShow(this.dialog);
+
+				if (that.options.position) {
+					position = $.extend({}, that.options.position);
+					if (position.of === 'element') {
+						position.of = element;
+					}
+				} else {
+					position = {
+						my:			'left top',
+						at:			'left bottom',
+						of:			element,
+						collision:	'flip'
+					};
+				}
+				that.dialog.position(position);
 				
 				that.opened = true;
 				that._callback('open', true);
 
 				// Without waiting for domready the width of the map is 0 and we
 				// wind up with the cursor stuck in the upper left corner
-				$(function () {
+				$(function() {
 					that._repaintAllParts();
 				});
 			}
 		},
-
-		close: function () {
+		
+		close: function (cancel) {
 			var that = this;
 
-			if (that.opened) {
-				that.previousFont = that.font.copy();
-				that.changed = false;		//@todo on open instead?
+			if (!that.opened) {
+				return;
+			}				
+				
+            if (cancel) {
+				that.font = that.currentFont.copy();
+                that._change();
+                that._callback('cancel', true);
+            } else {
+				that.currentFont	= that.font.copy();
+                that._callback('ok', true);
+            }
+			that.changed		= false;
 
-				// tear down the interface
-				that._effectHide(that.dialog, function () {
-					that.dialog.empty();
-					that.generated = false;
-
-					that.opened = false;
-					that._callback('close');
-				});
-
-				if (that.overlay) {
-					that.overlay.destroy();
-				}
+			if (that.overlay) {
+				$(window).unbind('resize', that.events.window_resize);					
+				that.overlay.remove();
 			}
-		},
+			
+			// tear down the interface
+			that._effectHide(that.dialog, function () {
+				that.dialog.remove();
+				that.dialog		= null;
+				that.generated	= false;
+
+				that.opened		= false;
+				that._callback('close', true);
+			});
+		},		
 
 		destroy: function () {
 			var that = this;
@@ -1300,24 +1389,24 @@
 			
 			if (that.events.resizeOverlay !== null) {
 				$(window).unbind('resize', that.events.resizeOverlay);					
-			}
+			}			
 			
 			this.element.unbind();
 
+			if (this.overlay) {
+				this.overlay.remove();
+			}
+			
+			if (this.dialog !== null) {
+				this.dialog.remove();
+			}
+			
 			if (this.image !== null) {
 				this.image.remove();
 			}
 
 			if (this.button !== null) {
 				this.button.remove();
-			}
-
-			if (this.dialog !== null) {
-				this.dialog.remove();
-			}
-
-			if (this.overlay) {
-				this.overlay.destroy();
 			}
 		},
 
@@ -1361,31 +1450,45 @@
 			});
 		},
 
-		_change: function (set /* = true */) {
-			this.font.set = (set !== false);
-
-			this.changed = true;
-
+		_change: function (stoppedChanging /* = true */) {
+			this.changed = !this.font.equals(this.currentFont);
+			
 			// update input element content
-			if (!this.inline) {		//@todo if input, if style, output style
+			if (!this.inline) {
 				if (!this.font.set) {
-					this.element.val('');
+					if (this.element.val() !== '') {
+						this.element.val('').change();
+					}
 				} else {
-					var css = this.font.toCSS();
-					if (this.element.val() != css) {
-						this.element.val(css);
+					var css = '';
+					if (this.element.is('input')) {
+						css = this.element.val();					
+					} else if (this.element.text()) {
+						css = this.element;										
+					}
+					if (!this.font.equals(this._parseFont(css))) {
+						this.element.val(this.font.toCSS()).change();
 					}
 				}
-
-				this._setAltField();
 			}
 
+			// Set the alt field
+			this._setAltField();
+
+			// update color option
+			this.options.font = this.font.set ? this.font.toCSS() : '';
+
+			// Repaint
 			if (this.opened) {
 				this._repaintAllParts();
 			}
 
 			// callback
 			this._callback('select');
+			
+			if (typeof stoppedChanging === 'undefined' ? true : !!stoppedChanging) {
+				this._callback('stop');
+			}
 		},
 
 		// This will be deprecated by jQueryUI 1.9 widget
@@ -1409,7 +1512,31 @@
 		_getRegional: function (name) {
 			return $.fontpicker.regional[this.options.regional][name] !== undefined ?
 					$.fontpicker.regional[this.options.regional][name] : $.fontpicker.regional[''][name];
-		}
+		},
+		
+		_parseFont: function(css) {
+			var that = this,			
+				font = new $.fontpicker.Font(css);
+			
+			if (font.css['font-family']) {
+				var faces = font.css['font-family'].split(/,/),
+					found = false;
+
+				$.each(faces, function (index, face) {
+					face = $.trim(face.replace(/^(['"])(.*)\1$/, '$2'));
+					$.each(that.options.families, function (index, family) {
+						if (face == family.name) {
+							font.css['font-family'] = family.faces;
+							found = true;
+							return !found;
+						}
+					});
+					return !found;
+				});
+			}
+			
+			return font;
+        }
 	});
 
 	return $.vanderlee.fontpicker;

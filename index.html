@@ -60,7 +60,9 @@
 		Popup content-div: <div id="fp-content" style="font-family: Verdana; font-size: 20px;">Text goes right here!</div>
         <script>
            	$(function() {
-                $('#fp-content').fontpicker();
+                $('#fp-content').fontpicker({
+					parts: 'full'
+				});
             });
         </script>
 
