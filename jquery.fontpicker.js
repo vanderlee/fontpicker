@@ -638,7 +638,7 @@
 							html += '<div class="ui-fontpicker-buttonset">';
 
 							if (!inst.inline && inst.options.showNoneButton) {
-								html += '<input type="radio" name="ui-fontpicker-special" id="' + id_none + ' class="ui-fontpicker-special-none"><label for="' + id_none + '">' + inst._getRegional('none') + '</label>';
+								html += '<input type="radio" name="ui-fontpicker-special" id="' + id_none + '" class="ui-fontpicker-special-none"><label for="' + id_none + '">' + inst._getRegional('none') + '</label>';
 							}
 							html += '</div>';
 						}
@@ -949,7 +949,7 @@
 				// showOn button
 				if (/\bbutton|all|both\b/.test(that.options.showOn)) {
 					if (that.options.buttonImage !== '') {
-						text = that.options.buttonText || that._getRegional('button');
+						var text = that.options.buttonText || that._getRegional('button');
 
 						that.image = $('<img/>').attr({
 							'src':		that.options.buttonImage,
@@ -959,8 +959,6 @@
 						if (that.options.buttonClass) {
 							that.image.attr('class', that.options.buttonClass);
 						}
-
-						that._setImageBackground();
 					}
 
 					if (that.options.buttonImageOnly && that.image) {
