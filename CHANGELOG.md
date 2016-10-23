@@ -10,6 +10,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added several missing translation strings.
 
 ### Changed
-- Lots of code refactoring
+- Lots of code refactoring; brought in-line with [Colorpicker](https://github.com/vanderlee/colorpicker)
 - Renamed option `previewText` to `preview`.
 - Renamed translation key `previewText` to `preview`.

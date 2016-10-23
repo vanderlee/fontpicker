@@ -1,5 +1,5 @@
 /*jslint devel: true, bitwise: true, regexp: true, browser: true, confusion: true, unparam: true, eqeq: true, white: true, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
-/*globals jQuery,Font,define */
+/*globals define,jQuery,Font */
 
 /*!
  * FontPicker
@@ -11,9 +11,8 @@
  * Most images from jPicker by Christopher T. Tillman.
  * Sourcecode created from scratch by Martijn W. van der Lee.
  */
-
-(function (factory) {
-	if (typeof define === "function" && define.amd) {
+(function( factory ) {
+	if (typeof define === "function" && define.amd ) {
 
 		// AMD. Register as an anonymous module.
 		define([
@@ -56,7 +55,7 @@
 
 				this.id = function () {
 					return id;
-				}
+				};
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" step="5" min="0" max="9999" type="number" value="' + (inst.font.css['line-height'] ? parseInt(inst.font.css['line-height']) : '') + '"/>')
@@ -80,7 +79,7 @@
 
 				this.id = function () {
 					return id;
-				}
+				};
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
@@ -104,7 +103,7 @@
 
 				this.id = function () {
 					return id;
-				}
+				};
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
@@ -128,7 +127,7 @@
 
 				this.id = function () {
 					return id;
-				}
+				};
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
@@ -152,7 +151,7 @@
 
 				this.id = function () {
 					return id;
-				}
+				};
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" type="checkbox"/>')
@@ -177,14 +176,14 @@
 
 				this.id = function () {
 					return id;
-				}
+				};
 
 				this.paintTo = function (container) {
 					$('<input id="' + id + '" min="-999" max="999" type="number" value="' + (inst.font.css['letter-spacing'] ? parseInt(inst.font.css['letter-spacing']) : '') + '"/>')
 							.appendTo(container)
 							.change(function () {
 								var value = $(this).val();
-								inst.font.css['letter-spacing'] = value && value != 0 ? value + 'px' : null;
+								inst.font.css['letter-spacing'] = value && value !== 0 ? value + 'px' : null;
 								inst.font.set = true;								
 								inst._change();
 							}).after(inst._getRegional('unit-pixel'));
@@ -392,8 +391,8 @@
 
 					if (!inst.inline && inst.options.draggable) {
 						var draggableOptions = {
-							handle: part,
-						}
+							'handle': part
+						};
 						if (inst.options.containment) {
 							draggableOptions.containment = inst.options.containment;
 						}
@@ -431,7 +430,7 @@
 					},
 					_set = function (name) {
 						$.each(_families(), function (index, family) {
-							if (family.name.toLowerCase() == name.toLowerCase()) {
+							if (family.name.toLowerCase() === name.toLowerCase()) {
 								inst.font.css['font-family'] = family.faces;
 								inst.font.set = true;
 								inst._change();
@@ -455,7 +454,7 @@
 				this.repaint = function () {
 					var face = inst.font.css['font-family'] ? inst.font.css['font-family'][0] : '';
 					$.each(_families(), function (index, family) {
-						if (family.faces == inst.font.css['font-family']) {
+						if (family.faces === inst.font.css['font-family']) {
 							$('.ui-fontpicker-family-text,.ui-fontpicker-family-select', part).not(':focus').val(face);
 							return false;	// break
 						}
@@ -478,9 +477,9 @@
 					},
 					_set = function (name) {
 						$.each(inst.options.styles, function (index, style) {
-							if (style.name.toLowerCase() == name.toLowerCase()) {
-								inst.font.css['font-weight'] = style.weight == 'normal' ? null : style.weight;
-								inst.font.css['font-style'] = style.style == 'normal' ? null : style.style;
+							if (style.name.toLowerCase() === name.toLowerCase()) {
+								inst.font.css['font-weight'] = style.weight === 'normal' ? null : style.weight;
+								inst.font.css['font-style'] = style.style === 'normal' ? null : style.style;
 								inst.font.set = true;								
 								inst._change();
 								return false;	// break
@@ -502,10 +501,9 @@
 
 				this.repaint = function () {
 					var bold = inst.font.css['font-weight'] || 'normal',
-							italic = inst.font.css['font-style'] || 'normal';
+						italic = inst.font.css['font-style'] || 'normal';
 					$.each(inst.options.styles, function (index, style) {
-						if (style.weight == bold
-								&& style.style == italic) {
+						if (style.weight === bold && style.style === italic) {
 							$('.ui-fontpicker-style-text,.ui-fontpicker-style-select', part).not(':focus').val(style.name);
 							return false;	// break
 						}
@@ -663,9 +661,7 @@
 					});
 
 					$('.ui-fontpicker-cancel', part).button().click(function () {
-						inst.font = $.extend({}, inst.previousFont);
-						inst._change();
-						inst.close();
+						inst.close(true);
 					});
 
 					$('.ui-fontpicker-buttonset', part)[$.fn.controlgroup ? 'controlgroup' : 'buttonset']();
@@ -820,17 +816,17 @@
 
 	$.widget("vanderlee.fontpicker", {
 		options: {
-			altField: '', // selector for DOM elements which matches changes.
-			altOnChange: true, // true to update on each change, false to update only on close.
-			autoOpen: false, // Open dialog automatically upon creation
-			buttonImage: 'images/ui-fontpicker.png',
-			buttonImageOnly: false,
-			buttonText: null, // Text on the button and/or title of button image.
-			closeOnEscape: true, // Close the dialog when the escape key is pressed.
-			closeOnOutside: true, // Close the dialog when clicking outside the dialog (not for inline)
-			duration: 'fast',
-			families: $.fontpicker.families.default,
-			inlineFrame: true,		// Show a border and background when inline.
+			altField:			'', // selector for DOM elements which matches changes.
+			altOnChange:		true, // true to update on each change, false to update only on close.
+			autoOpen:			false, // Open dialog automatically upon creation
+			buttonImage:		'images/ui-fontpicker.png',
+			buttonImageOnly:	false,
+			buttonText:			null, // Text on the button and/or title of button image.
+			closeOnEscape:		true, // Close the dialog when the escape key is pressed.
+			closeOnOutside:		true, // Close the dialog when clicking outside the dialog (not for inline)
+			duration:			'fast',
+			families:			$.fontpicker.families.default,
+			inlineFrame:		true,		// Show a border and background when inline.
 			layout: {
 				family: [0, 0, 1, 1], // Left, Top, Width, Height (in table cells).
 				style: [1, 0, 1, 1],
@@ -838,11 +834,11 @@
 				settings: [0, 1, 3, 1],
 				preview: [0, 2, 3, 1]
 			},
-			modal: false, // Modal dialog?
+			modal:				false, // Modal dialog?
 			nullable:			true,			
-			parts: '', // leave empty for automatic selection
-			preview: null,
-			regional: '',
+			parts:				'', // leave empty for automatic selection
+			preview:			null,
+			regional:			'',
 			settings: {
 				'character': [
 					'letter-spacing',
@@ -855,10 +851,10 @@
 					'line-height'
 				]
 			},
-			showAnim: 'fadeIn',
-			showNoneButton: false,
-			showOn:	'focus click alt',		// 'focus', 'click', 'button', 'alt', 'all'
-			showOptions: {},
+			showAnim:			'fadeIn',
+			showNoneButton:		false,
+			showOn:				'focus click alt',		// 'focus', 'click', 'button', 'alt', 'all'
+			showOptions:		{},
 			sizes: [6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72],
 			styles: [
 				{	name: 'Normal',
@@ -878,7 +874,7 @@
 					style: 'italic'
 				}
 			],
-			title: null,
+			title:				null,
 
 			cancel:             null,
             close:              null,
@@ -896,15 +892,15 @@
 
 			that.widgetEventPrefix = 'fontpicker';
 
-			that.opened = false;
-			that.generated = false;
-			that.inline = false;	//@todo use that.source = null
-			that.changed = false;
+			that.opened		= false;
+			that.generated	= false;
+			that.inline		= false;
+			that.changed	= false;
 			
-			that.dialog = null;
-			that.button = null;
-			that.image = null;
-			that.overlay = null;
+			that.dialog		= null;
+			that.button		= null;
+			that.image		= null;
+			that.overlay	= null;
 			
 			that.events = {
 				window_resize:			null,
@@ -1004,20 +1000,14 @@
 			return this;
 		},
 
-		_setOption: function (key, value) {
-			var that = this;
-
+		_setOption: function(key, value) {
 			switch (key) {
-				case "disabled":
-					if (value) {
-						that.dialog.addClass('ui-fontpicker-disabled');
-					} else {
-						that.dialog.removeClass('ui-fontpicker-disabled');
-					}
+				case 'disabled':
+					this[value ? 'disable' : 'enable']();
 					break;
 			}
 
-			$.Widget.prototype._setOption.apply(that, arguments);
+			$.Widget.prototype._setOption.apply(this, arguments);
 		},
 
 		enable: function () {
@@ -1167,7 +1157,7 @@
 
 			// Determine the parts to include in this fontpicker
 			if (typeof that.options.parts === 'string') {
-				if (that.options.parts in $.fontpicker.partslists) {
+				if ($.fontpicker.partslists[that.options.parts]) {
 					parts_list = $.fontpicker.partslists[that.options.parts];
 				} else {
 					// automatic
@@ -1188,11 +1178,11 @@
 			if (!that.generated) {
 				layout_parts = [];
 
-				$.each(that.options.layout, function (part, pos) {
+				$.each(that.options.layout, function(part, pos) {
 					if (that.parts[part]) {
 						layout_parts.push({
-							'part': part,
-							'pos': pos
+							'part':	part,
+							'pos':	pos
 						});
 					}
 				});
@@ -1412,12 +1402,12 @@
 			var that = this;
 
 			if (that.font.set) {
-				that._trigger(callback, null, {
+				return that._trigger(callback, null, {
 					style: that.font.toCSS(),
 					css: that.font.css
 				});
 			} else {
-				that._trigger(callback, null, {
+				return that._trigger(callback, null, {
 					style: '',
 					css: {}
 				});
@@ -1449,6 +1439,7 @@
 		},
 
 		_change: function (stoppedChanging /* = true */) {
+			// Set changed if different from starting font
 			this.changed = !this.font.equals(this.currentFont);
 			
 			// update input element content
@@ -1481,7 +1472,7 @@
 				this._repaintAllParts();
 			}
 
-			// callback
+			// callbacks
 			this._callback('select');
 			
 			if (typeof stoppedChanging === 'undefined' ? true : !!stoppedChanging) {
@@ -1523,7 +1514,7 @@
 				$.each(faces, function (index, face) {
 					face = $.trim(face.replace(/^(['"])(.*)\1$/, '$2'));
 					$.each(that.options.families, function (index, family) {
-						if (face == family.name) {
+						if (face === family.name) {
 							font.css['font-family'] = family.faces;
 							found = true;
 							return !found;
