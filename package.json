@@ -1,0 +1,28 @@
+{
+  "name": "fontpicker",
+  "version": "0.1.3",
+  "homepage": "https://github.com/vanderlee/fontpicker",
+  "author": "Martijn van der Lee <martijn@vanderlee.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vanderlee/fontpicker"
+  },
+  "description": "JQuery fontpicker: themeroller styling, CSS style features. Standard look & feel, configurable. Works as a popup or inline.",
+  "main": "jquery.fontpicker.js",
+  "keywords": [
+    "jquery",
+    "fontpicker"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+	"jquery": ">=1.7.1",
+    "jquery-ui": ">=1.8.16"
+  }
+}
