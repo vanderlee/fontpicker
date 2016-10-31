@@ -1,6 +1,6 @@
 Fontpicker
 ==========
-Version 0.1.2
+Version 0.1.3
 
 [![License](https://img.shields.io/github/license/vanderlee/colorpicker.svg)]()
 
