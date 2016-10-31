@@ -621,7 +621,7 @@
 				};
 
 				this.repaint = function () {
-					$('.ui-fontpicker-preview-text', part).attr('style', inst.font.toCSS(true));
+					$('.ui-fontpicker-preview-text', part).attr('style', inst.font.getCss(true));
 				};
 			},
 
@@ -722,12 +722,12 @@
 			this.equals = function(font) {
 				if (font) {
 					return this.set === font.set
-						&& this.toCSS() === font.toCSS();
+						&& this.getCss() === font.getCss();
 				}
 				return false;
 			};
 
-			this.toCSS = function () {
+			this.getCss = function () {
 				var styles = [],
 					parts;
 
@@ -747,7 +747,7 @@
 					}
 				});
 
-				return styles.join(';');
+				return styles.sort().join(';');				
 			};
 
 			this.copy = function () {
@@ -1036,7 +1036,7 @@
 
 		_setAltField: function () {
 			if (this.options.altOnChange && this.options.altField) {
-				$(this.options.altField).attr('style', this.font.set ? this.font.toCSS() : '');
+				$(this.options.altField).attr('style', this.font.set ? this.font.getCss() : '');
 			}
 		},
 
@@ -1053,7 +1053,7 @@
 		},
 		
 		getFont: function() {
-			return this.font.toCSS();
+			return this.font.getCss();
 		},
 		
 		_generateInline: function() {
@@ -1403,7 +1403,7 @@
 
 			if (that.font.set) {
 				return that._trigger(callback, null, {
-					style: that.font.toCSS(),
+					style: that.font.getCss(),
 					css: that.font.css
 				});
 			} else {
@@ -1456,7 +1456,7 @@
 						css = this.element;										
 					}
 					if (!this.font.equals(this._parseFont(css))) {
-						this.element.val(this.font.toCSS()).change();
+						this.element.val(this.font.getCss()).change();
 					}
 				}
 			}
@@ -1465,7 +1465,7 @@
 			this._setAltField();
 
 			// update color option
-			this.options.font = this.font.set ? this.font.toCSS() : '';
+			this.options.font = this.font.set ? this.font.getCss() : '';
 
 			// Repaint
 			if (this.opened) {
