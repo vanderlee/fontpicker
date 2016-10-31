@@ -751,9 +751,7 @@
 			};
 
 			this.copy = function () {
-				var font = new $.fontpicker.Font(this.style);
-				font.set = this.set;
-				return font;
+				return $.extend({}, this);
 			};
 
 			this.setCss = function (style) {
@@ -762,6 +760,9 @@
 					item = $('<div style="' + style + '"/>').appendTo(wrapper),
 					actual;
 
+				// Big font-size, for more accurate readings
+				wrapper.css('font-size', 10000);
+					
 				// Compare-to-normal, unchanged
 				$.each({
 					'text-decoration': 'none',
