@@ -48,153 +48,6 @@
 			return r.test(sentence);
 		},
 		
-		_settings = {
-			'line-height': function (inst) {
-				var that = this,
-						id = 'ui-fontpicker-settings-lineheight';
-
-				this.id = function () {
-					return id;
-				};
-
-				this.paintTo = function (container) {
-					$('<input id="' + id + '" step="5" min="0" max="9999" type="number" value="' + (inst.font.css['line-height'] ? parseInt(inst.font.css['line-height']) : '') + '"/>')
-							.appendTo(container)
-							.change(function () {
-								var value = $(this).val();
-								inst.font.css['line-height'] = value ? value + '%' : null;
-								inst.font.set = true;								
-								inst._change();
-							}).after(inst._getRegional('unit-percentage'));
-				};
-
-				this.label = function () {
-					return inst._getRegional('setting-line-height');
-				};
-			},
-
-			'small-caps': function (inst) {
-				var that = this,
-						id = 'ui-fontpicker-settings-smallcaps';
-
-				this.id = function () {
-					return id;
-				};
-
-				this.paintTo = function (container) {
-					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(inst.font.css['font-variant'], 'small-caps'))
-							.appendTo(container)
-							.change(function () {
-								inst.font.css['font-variant'] = $(this).is(':checked') ? 'small-caps' : null;
-								inst.font.set = true;								
-								inst._change();
-							});
-				};
-
-				this.label = function () {
-					return inst._getRegional('setting-small-caps');
-				};
-			},
-
-			'underline': function (inst) {
-				var that = this,
-						id = 'ui-fontpicker-settings-underline';
-
-				this.id = function () {
-					return id;
-				};
-
-				this.paintTo = function (container) {
-					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(inst.font.css['text-decoration'], 'underline'))
-							.appendTo(container)
-							.change(function () {
-								inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'underline', $(this).is(':checked'));
-								inst.font.set = true;								
-								inst._change();
-							});
-				};
-
-				this.label = function () {
-					return inst._getRegional('setting-underline');
-				};
-			},
-
-			'overline': function (inst) {
-				var that = this,
-						id = 'ui-fontpicker-settings-overline';
-
-				this.id = function () {
-					return id;
-				};
-
-				this.paintTo = function (container) {
-					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(inst.font.css['text-decoration'], 'overline'))
-							.appendTo(container)
-							.change(function () {
-								inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'overline', $(this).is(':checked'));
-								inst.font.set = true;								
-								inst._change();
-							});
-				};
-
-				this.label = function () {
-					return inst._getRegional('setting-overline');
-				};
-			},
-
-			'line-through': function (inst) {
-				var that = this,
-						id = 'ui-fontpicker-settings-linethrough';
-
-				this.id = function () {
-					return id;
-				};
-
-				this.paintTo = function (container) {
-					$('<input id="' + id + '" type="checkbox"/>')
-							.attr('checked', _hasWord(inst.font.css['text-decoration'], 'line-through'))
-							.appendTo(container)
-							.change(function () {
-								inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
-								inst.font.set = true;								
-								inst._change();
-							});
-				};
-
-				this.label = function () {
-					return inst._getRegional('setting-line-through');
-				};
-			},
-
-			'letter-spacing': function (inst) {
-				var that = this,
-						id = 'ui-fontpicker-settings-letterspacing',
-						input = null;
-
-				this.id = function () {
-					return id;
-				};
-
-				this.paintTo = function (container) {
-					$('<input id="' + id + '" min="-999" max="999" type="number" value="' + (inst.font.css['letter-spacing'] ? parseInt(inst.font.css['letter-spacing']) : '') + '"/>')
-							.appendTo(container)
-							.change(function () {
-								var value = $(this).val();
-								inst.font.css['letter-spacing'] = value && value !== 0 ? value + 'px' : null;
-								inst.font.set = true;								
-								inst._change();
-							}).after(inst._getRegional('unit-pixel'));
-				};
-
-				this.label = function () {
-					return inst._getRegional('setting-letter-spacing');
-				};
-			}
-		},
-		
 		_layoutTable = function (layout, callback) {
 				var bitmap,
 						x, y,
@@ -560,6 +413,152 @@
 					part = null,
 					_html = function () {
 						return '<div class="ui-fontpicker-settings"><ul/></div>';
+					},					
+					_settings = {
+						'line-height': function (inst) {
+							var that = this,
+									id = 'ui-fontpicker-settings-lineheight-' + inst.fontpicker_index;
+
+							this.id = function () {
+								return id;
+							};
+
+							this.paintTo = function (container) {
+								$('<input id="' + id + '" step="5" min="0" max="9999" type="number" value="' + (inst.font.css['line-height'] ? parseInt(inst.font.css['line-height']) : '') + '"/>')
+										.appendTo(container)
+										.change(function () {
+											var value = $(this).val();
+											inst.font.css['line-height'] = value ? value + '%' : null;
+											inst.font.set = true;								
+											inst._change();
+										}).after(inst._getRegional('unit-percentage'));
+							};
+
+							this.label = function () {
+								return inst._getRegional('setting-line-height');
+							};
+						},
+
+						'small-caps': function (inst) {
+							var that = this,
+									id = 'ui-fontpicker-settings-smallcaps-' + inst.fontpicker_index;
+
+							this.id = function () {
+								return id;
+							};
+
+							this.paintTo = function (container) {
+								$('<input id="' + id + '" type="checkbox"/>')
+										.attr('checked', _hasWord(inst.font.css['font-variant'], 'small-caps'))
+										.appendTo(container)
+										.change(function () {
+											inst.font.css['font-variant'] = $(this).is(':checked') ? 'small-caps' : null;
+											inst.font.set = true;								
+											inst._change();
+										});
+							};
+
+							this.label = function () {
+								return inst._getRegional('setting-small-caps');
+							};
+						},
+
+						'underline': function (inst) {
+							var that = this,
+									id = 'ui-fontpicker-settings-underline-' + inst.fontpicker_index;
+
+							this.id = function () {
+								return id;
+							};
+
+							this.paintTo = function (container) {
+								$('<input id="' + id + '" type="checkbox"/>')
+										.attr('checked', _hasWord(inst.font.css['text-decoration'], 'underline'))
+										.appendTo(container)
+										.change(function () {
+											inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'underline', $(this).is(':checked'));
+											inst.font.set = true;								
+											inst._change();
+										});
+							};
+
+							this.label = function () {
+								return inst._getRegional('setting-underline');
+							};
+						},
+
+						'overline': function (inst) {
+							var that = this,
+									id = 'ui-fontpicker-settings-overline-' + inst.fontpicker_index;
+
+							this.id = function () {
+								return id;
+							};
+
+							this.paintTo = function (container) {
+								$('<input id="' + id + '" type="checkbox"/>')
+										.attr('checked', _hasWord(inst.font.css['text-decoration'], 'overline'))
+										.appendTo(container)
+										.change(function () {
+											inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'overline', $(this).is(':checked'));
+											inst.font.set = true;								
+											inst._change();
+										});
+							};
+
+							this.label = function () {
+								return inst._getRegional('setting-overline');
+							};
+						},
+
+						'line-through': function (inst) {
+							var that = this,
+									id = 'ui-fontpicker-settings-linethrough-' + inst.fontpicker_index;
+
+							this.id = function () {
+								return id;
+							};
+
+							this.paintTo = function (container) {
+								$('<input id="' + id + '" type="checkbox"/>')
+										.attr('checked', _hasWord(inst.font.css['text-decoration'], 'line-through'))
+										.appendTo(container)
+										.change(function () {
+											inst.font.css['text-decoration'] = _setWord(inst.font.css['text-decoration'], 'line-through', $(this).is(':checked'));
+											inst.font.set = true;								
+											inst._change();
+										});
+							};
+
+							this.label = function () {
+								return inst._getRegional('setting-line-through');
+							};
+						},
+
+						'letter-spacing': function (inst) {
+							var that = this,
+									id = 'ui-fontpicker-settings-letterspacing-' + inst.fontpicker_index,
+									input = null;
+
+							this.id = function () {
+								return id;
+							};
+
+							this.paintTo = function (container) {
+								$('<input id="' + id + '" min="-999" max="999" type="number" value="' + (inst.font.css['letter-spacing'] ? parseInt(inst.font.css['letter-spacing']) : '') + '"/>')
+										.appendTo(container)
+										.change(function () {
+											var value = $(this).val();
+											inst.font.css['letter-spacing'] = value && value !== 0 ? value + 'px' : null;
+											inst.font.set = true;								
+											inst._change();
+										}).after(inst._getRegional('unit-pixel'));
+							};
+
+							this.label = function () {
+								return inst._getRegional('setting-letter-spacing');
+							};
+						}
 					};
 
 				this.init = function () {
@@ -568,20 +567,20 @@
 					inst.settings = {};
 					$.each(inst.options.settings, function (label, settings) {
 						var columns = 3,
-								id = 'ui-fontpicker-settings-' + label.toLowerCase() + '-' + inst.fontpicker_index,
-								page = $('<div id="' + id + '"></div>').appendTo(part),
-								chunk_size = Math.ceil(settings.length / columns),
-								chunks = [].concat.apply([],
+							id = 'ui-fontpicker-settings-' + label.toLowerCase() + '-' + inst.fontpicker_index,
+							page = $('<div id="' + id + '"></div>').appendTo(part),
+							chunk_size = Math.ceil(settings.length / columns),
+							chunks = [].concat.apply([],
 								//@todo Better chunking algorithm that prefers columns over chunk_size
 								settings.map(function (elem, i) {
 									return i % chunk_size ? [] : [settings.slice(i, i + chunk_size)];
 								})
-								),
-								table = $('<table class="ui-fontpicker-settings-table"/>').appendTo(page),
-								r,
-								row,
-								c,
-								item;
+							),
+							table = $('<table class="ui-fontpicker-settings-table"/>').appendTo(page),
+							r,
+							row,
+							c,
+							item;
 
 						for (r = 0; r < chunk_size; ++r) {
 							row = $('<tr/>').appendTo(table);
